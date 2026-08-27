@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  ArrowRight, Check, ChevronDown, LockKeyhole, ShieldCheck,
+  ArrowRight, Check, ChevronDown, LockKeyhole, Mail, MonitorSmartphone, ShieldCheck,
 } from 'lucide-react'
 import './App.css'
 
@@ -127,6 +127,7 @@ function App() {
 
       <section className="hero relative isolate">
         <div className="hero-background" aria-hidden="true"><img src="/metodo-entrevista-6-guias-v2.png" alt="" /></div>
+        <div className="hero-photo-ribbon"><span>SOLO POR HOY {offerDay}</span><strong>5 EBOOKS EXTRA GRATIS</strong></div>
         <div className="hero-orb hero-orb-one" aria-hidden="true"></div>
         <div className="hero-orb hero-orb-two" aria-hidden="true"></div>
         <div className="hero-inner section-shell">
@@ -167,41 +168,22 @@ function App() {
               <ul><li>Un CV adaptado y más fácil de entender</li><li>Nuevos portales y empresas donde postularte</li><li>Usar IA gratuita para mejorar tu presentación y ahorrar tiempo</li><li>LinkedIn activo y contactos orgánicos</li><li>Más preparación para responder cuando te llamen</li></ul>
             </div>
           </div>
-          <div className="transformation-cta">
-            <div className="transformation-offer-visual">
-              <img src="/metodo-entrevista-6-guias-v2.png" alt="Método Entrevista y los cinco ebooks incluidos" />
-              <span>EL PACK COMPLETO · 6 GUÍAS</span>
-            </div>
-            <div className="transformation-offer-content">
-              <div className="transformation-offer-copy">
-                <span className="transformation-urgency">SOLO POR HOY {offerDay}</span>
-                <strong>Método Entrevista</strong>
-                <em>+ 5 ebooks gratis</em>
-                <small>Todo el recorrido para ordenar tu búsqueda laboral.</small>
-              </div>
-              <div className="transformation-price">
-                <div><small>VALOR HABITUAL</small><del>$19.990</del></div>
-                <span>UN SOLO PAGO DE</span>
-                <strong>$8.990</strong>
-              </div>
-              <div className="transformation-action">
-                <BuyButton>Quiero las 6 guías</BuyButton>
-                <small>Acceso inmediato después de comprar</small>
-              </div>
-              <div className="transformation-trust"><span><Check aria-hidden="true" />Un solo pago</span><span><ShieldCheck aria-hidden="true" />Compra protegida por Mercado Pago</span><span><LockKeyhole aria-hidden="true" />Acceso de por vida</span></div>
-            </div>
-          </div>
         </div>
       </section>
 
       <section className="bundle-section section-shell">
         <div className="section-heading centered-heading"><p className="eyebrow">UNA COMPRA · SEIS GUÍAS</p><h2>Comprás Método Entrevista.<br /><em>Hoy te llevás los otros 5 gratis.</em></h2><p>Un paquete completo para trabajar tu CV, buscar oportunidades, usar IA, empezar en LinkedIn y prepararte para una entrevista.</p></div>
-        <article className="main-guide-card">
-          <div className="main-guide-book"><img src={guides[0].image} alt="Libro de tapa blanda Método Entrevista" /></div>
-          <div className="main-guide-copy"><p className="eyebrow">{guides[0].kicker}</p><h3>Método Entrevista</h3><p>{guides[0].description}</p><ul>{guides[0].points.map((point) => <li key={point}><Check aria-hidden="true" />{point}</li>)}</ul><div className="main-guide-seal"><span>GUÍA PRINCIPAL</span><strong>ACCESO DE POR VIDA</strong></div></div>
-        </article>
-        <div className="bonus-connector"><span>+</span><div><small>OFERTA DE HOY {offerDay}</small><strong>RECIBÍ ESTOS 5 EBOOKS SIN PAGARLOS APARTE</strong></div></div>
-        <div className="bundle-grid bonus-grid">
+        <div className="bundle-overview">
+          <div className="bundle-equation" aria-label="Método Entrevista más cinco ebooks incluidos">
+            <figure className="overview-main-book"><img src={guides[0].image} alt="Libro de tapa blanda Método Entrevista" /><figcaption>GUÍA PRINCIPAL</figcaption></figure>
+            <span className="overview-plus" aria-hidden="true">+</span>
+            <div className="overview-mini-books">
+              {guides.slice(1).map((guide) => <figure key={guide.title}><img src={guide.image} alt={guide.title.replace('\n', ' ')} /><figcaption>{guide.title.replace('\n', ' ')}</figcaption></figure>)}
+            </div>
+          </div>
+          <div className="bundle-overview-copy"><p>TODO EN UNA SOLA COMPRA</p><h3>Método Entrevista <span>+ 5 ebooks</span></h3><strong>Hoy los recibís sin pagarlos aparte.</strong><small>Un recorrido completo desde el primer paso de tu búsqueda hasta la preparación para una entrevista.</small><div className="bundle-overview-price"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TODO EL PACK POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small></div><a href="#ebooks-incluidos">Ver ebooks incluidos <ChevronDown aria-hidden="true" /></a></div>
+        </div>
+        <div className="bundle-grid bonus-grid" id="ebooks-incluidos">
           {guides.slice(1).map((guide) => <article className="bundle-card" key={guide.title}>
             <div className="bundle-book-visual"><img src={guide.image} alt={`Libro de tapa blanda ${guide.title.replace('\n', ' ')}`} /><span>{guide.kicker}</span></div>
             <h3>{guide.title.replace('\n', ' ')}</h3>
@@ -211,10 +193,23 @@ function App() {
           </article>)}
         </div>
         <div className="bundle-final-offer">
-          <p className="bonus-crossed-value"><span>VALOR DE LOS 5 EBOOKS EXTRA</span><del>$46.000</del></p>
-          <h3>Pagás solo <strong>$8.990</strong> por Método Entrevista<br /><em>y recibís todo.</em></h3>
-          <p className="bundle-offer-detail">Un solo pago · 6 guías digitales · acceso de por vida</p>
-          <BuyButton>Quiero Método Entrevista y los 5 ebooks gratis</BuyButton>
+          <div className="bundle-final-inner section-shell">
+            <div className="bundle-final-label"><span>OFERTA DE HOY {offerDay}</span><strong>6</strong><small>GUÍAS<br />DIGITALES</small></div>
+            <div className="bundle-final-message"><h3>Todo el método.<span>Todos los extras.</span></h3><p>Método Entrevista más cinco ebooks para trabajar tu CV, usar IA, comenzar en LinkedIn, buscar oportunidades y prepararte para una entrevista.</p><div className="bonus-crossed-value"><span>LOS 5 EBOOKS EXTRA VALEN</span><del>$46.000</del><strong>HOY VAN GRATIS</strong></div></div>
+            <div className="bundle-final-buy"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TE LLEVÁS TODO POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small><BuyButton>Quiero el método completo</BuyButton><p><ShieldCheck aria-hidden="true" /> Compra protegida por Mercado Pago</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="delivery-section">
+        <div className="section-shell">
+          <div className="section-heading centered-heading"><p className="eyebrow">COMPRA SIMPLE · ACCESO DIGITAL</p><h2>Comprás una vez.<br /><em>Recibís todo en tu correo.</em></h2><p>El proceso es sencillo y podés acceder a las seis guías desde el dispositivo que ya usás todos los días.</p></div>
+          <div className="delivery-flow">
+            <article><span><ShieldCheck aria-hidden="true" /></span><small>PASO 1</small><h3>Pagás de forma segura</h3><p>Realizás un único pago protegido a través de Mercado Pago.</p></article>
+            <article><span><Mail aria-hidden="true" /></span><small>PASO 2</small><h3>Te llega todo por correo</h3><p>Recibís el acceso y la información necesaria para abrir las seis guías.</p></article>
+            <article><span><MonitorSmartphone aria-hidden="true" /></span><small>PASO 3</small><h3>Lo ves donde quieras</h3><p>Podés leerlo desde tu celular, tablet, notebook o computadora.</p></article>
+          </div>
+          <figure className="delivery-devices"><img src="/acceso-dispositivos-6-ebooks.png" alt="Notebook, tablet y celular mostrando la biblioteca digital con los seis ebooks de Método Entrevista" /><figcaption><span>ACCESO DIGITAL</span><strong>Las seis guías disponibles en cualquier dispositivo</strong></figcaption></figure>
         </div>
       </section>
 
@@ -233,28 +228,15 @@ function App() {
         </div>
       </section>
 
-      <section className="cv-section">
-        <div className="section-shell cv-grid">
-          <figure className="cv-mockup cv-photo-card">
-            <img src="/cv-real-datos-desenfocados.png" alt="Ejemplo realista de un CV de una columna con los datos personales desenfocados" />
-            <div className="ats-stamp"><ShieldCheck /><span>LISTO PARA<br /><strong>POSTULARTE</strong></span></div>
-            <figcaption>Ejemplo ilustrativo · Datos personales protegidos</figcaption>
-          </figure>
-          <div className="cv-copy"><p className="eyebrow">BONO DESTACADO</p><h2>Un CV preparado para los filtros actuales <em>y para quien decide a quién llamar.</em></h2><p>Aprendé qué formato utilizar, cómo ordenar tu información, qué errores evitar y cómo adaptar tu currículum al trabajo que buscás.</p>
-            <ul><li><Check />Qué son los filtros ATS, explicado fácil</li><li><Check />Formatos y diseños que se pueden leer correctamente</li><li><Check />Cómo mira un CV una persona de selección</li><li><Check />Modelos y ejemplos para editar</li></ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="steps-section section-shell">
-        <div className="section-heading centered-heading"><p className="eyebrow">SIMPLE Y A TU RITMO</p><h2>Empezá desde el celular<br /><em>en tres pasos.</em></h2></div>
-        <div className="steps-grid"><article><span>1</span><h3>Comprás de forma segura</h3><p>Realizás un único pago mediante Mercado Pago.</p></article><article><span>2</span><h3>Recibís el acceso</h3><p>Te llega por correo el enlace con todas las guías.</p></article><article><span>3</span><h3>Aplicás cada cambio</h3><p>Avanzás paso a paso y dejás preparada tu búsqueda.</p></article></div>
-      </section>
-
       <section className="author-section">
-        <div className="section-shell author-grid">
-          <figure className="author-mark author-photo"><img src="/valeria-fursten.png" alt="Valeria Fursten trabajando desde su computadora" /><figcaption><strong>VALERIA FURSTEN</strong><span>PSICÓLOGA + RECRUITER</span></figcaption></figure>
-          <div className="author-copy"><p className="eyebrow">QUIÉN CREÓ EL MÉTODO</p><h2>Soy Valeria Fursten,<br /><em>psicóloga y recruiter.</em></h2><p>Reuní en Método Entrevista las herramientas que una persona necesita para mejorar la forma en que busca trabajo y se presenta ante una empresa, con explicaciones claras y ejemplos que se pueden aplicar.</p></div>
+        <div className="section-shell author-strip">
+          <img className="author-avatar" src="/valeria-fursten.png" alt="Valeria Fursten, psicóloga y recruiter" />
+          <div className="author-copy">
+            <p className="eyebrow">CREADO POR UNA PROFESIONAL DE SELECCIÓN</p>
+            <h2>Valeria Fursten</h2>
+            <strong>Psicóloga y recruiter</strong>
+            <p>Reuní herramientas prácticas para ayudarte a presentar mejor tu perfil y ordenar tu búsqueda laboral.</p>
+          </div>
         </div>
       </section>
 
