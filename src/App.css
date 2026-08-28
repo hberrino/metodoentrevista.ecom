@@ -420,15 +420,15 @@ footer { padding-block:58px 110px; border-top:1px solid rgba(255,255,255,.1); ba
 }
 
 @media(max-width:600px){
-  .hero-bundle-chip{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:center;width:min(100%,350px);padding:11px}
+  .hero-bundle-chip{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;width:min(100%,350px);min-width:0;padding:11px}
   .hero-bundle-chip>span{grid-column:1}
   .hero-bundle-chip>strong{grid-column:1/-1;width:100%;text-align:left}
-  .mobile-activity{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;width:100%;gap:10px;margin-top:3px;padding-top:10px;border-top:1px solid rgba(19,34,58,.12)}
-  .mobile-activity-item{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:7px;padding-left:10px}
+  .mobile-activity{display:grid;grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;min-width:0;gap:10px;margin-top:3px;padding-top:10px;border-top:1px solid rgba(19,34,58,.12)}
+  .mobile-activity-item{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;min-width:0;gap:7px;padding-left:10px}
   .mobile-activity-item::before{content:'';position:absolute;left:0;width:5px;height:5px;border-radius:50%;background:#42a65a;box-shadow:0 0 0 3px rgba(66,166,90,.12)}
   .mobile-activity-item+.mobile-activity-item{padding-left:11px;border-left:1px solid rgba(19,34,58,.12)}
   .mobile-activity-item .flip-digit{width:18px;height:25px;font-size:15px}
-  .mobile-activity-item small{color:#425067;font-size:7px;font-weight:750;line-height:1.25;text-align:left}
+  .mobile-activity-item small{min-width:0;overflow-wrap:anywhere;color:#425067;font-size:7px;font-weight:750;line-height:1.25;text-align:left}
   .mobile-activity p{position:absolute;top:14px;right:11px;margin:0;color:var(--coral-dark);font-size:7px;font-weight:950;letter-spacing:.13em;text-align:right;text-transform:uppercase}
   .transform-photo{height:215px}
   .cv-photo-card>img{height:430px}
