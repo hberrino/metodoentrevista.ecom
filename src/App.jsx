@@ -96,6 +96,21 @@ function FlipNumber({ value }) {
   )
 }
 
+function AssuranceCard({ className = '' }) {
+  return (
+    <div className={`hero-assurance-card ${className}`.trim()}>
+      <strong><LockKeyhole aria-hidden="true" /> Compra rápida, segura y sin complicaciones</strong>
+      <ul>
+        <li><b>Pago protegido</b> mediante Mercado Pago.</li>
+        <li><b>Descarga inmediata</b> al acreditarse el pago.</li>
+        <li><b>Acceso de por vida</b> para consultarlo cuando quieras.</li>
+        <li><b>Compatible</b> con celular, PC o tablet.</li>
+        <li className="hero-buyers"><b>+700 personas</b> ya compraron nuestros ebooks.</li>
+      </ul>
+    </div>
+  )
+}
+
 function App() {
   const [offerDay, setOfferDay] = useState(getOfferDay)
   const [showMobileBuy, setShowMobileBuy] = useState(false)
@@ -225,7 +240,7 @@ function App() {
 
   return (
     <main>
-      <div className="offer-strip" aria-label={`Oferta de hoy ${offerDay}: 55% de descuento y 5 ebooks de regalo`}>
+      <div className="offer-strip" aria-label={`Oferta de hoy ${offerDay}: 52% de descuento y 5 ebooks de regalo`}>
         <div className="ticker-track">
           {tickerItems.map((item) => (
             <div className="ticker-item" key={item} aria-hidden={item > 0}>
@@ -233,7 +248,7 @@ function App() {
               <span>OFERTA DE HOY</span>
               <strong>{offerDay}</strong>
               <span className="strip-dot">•</span>
-              <span>55% OFF + 5 EBOOKS DE REGALO</span>
+              <span>52% OFF + 5 EBOOKS DE REGALO</span>
               <span className="ticker-gift">🎁</span>
               <span className="strip-dot">•</span>
               <span>ACCESO INMEDIATO</span>
@@ -245,24 +260,27 @@ function App() {
       <section className="hero relative isolate">
         <div className="hero-background" aria-hidden="true"><img src="/metodo-entrevista-6-guias-v2.png" alt="" width="1774" height="887" fetchPriority="high" decoding="async" /></div>
         <div className="hero-photo-ribbon"><span>SOLO POR HOY {offerDay}</span><strong>5 EBOOKS EXTRA GRATIS</strong></div>
-        <aside className="hero-activity" aria-label="Actividad de la promoción de hoy">
-          <div className="hero-activity-item">
-            <FlipNumber value={promotionStats.claimedToday} />
-            <span>personas aprovecharon<br /><b>la promo de hoy</b></span>
+        <aside className="hero-side" aria-label="Información de compra y actividad de la promoción">
+          <AssuranceCard className="hero-assurance-desktop" />
+          <div className="hero-activity">
+            <div className="hero-activity-item">
+              <FlipNumber value={promotionStats.claimedToday} />
+              <span>personas aprovecharon<br /><b>la promo de hoy</b></span>
+            </div>
+            <div className="hero-activity-item hero-activity-live">
+              <FlipNumber value={promotionStats.viewingNow} />
+              <span>personas viendo la página<br /><b>ahora mismo</b></span>
+            </div>
+            <p>Cambiá tu futuro.</p>
           </div>
-          <div className="hero-activity-item hero-activity-live">
-            <FlipNumber value={promotionStats.viewingNow} />
-            <span>personas viendo la página<br /><b>ahora mismo</b></span>
-          </div>
-          <p>Cambiá tu futuro.</p>
         </aside>
         <div className="hero-orb hero-orb-one" aria-hidden="true"></div>
         <div className="hero-orb hero-orb-two" aria-hidden="true"></div>
         <div className="hero-inner section-shell">
           <div className="hero-copy relative z-10">
-            <p className="eyebrow">TU BÚSQUEDA LABORAL, CON UN PLAN CLARO</p>
+            <p className="eyebrow">TU BÚSQUEDA LABORAL, AHORA CON RESULTADOS</p>
             <h1><span>Método Entrevista</span><em>La guía para conseguir ese trabajo.</em></h1>
-            <p className="hero-lead">Un recorrido simple y paso a paso para mejorar cómo te presentás, encontrar más oportunidades y llegar mejor preparado cuando te llamen.</p>
+            <p className="hero-lead">El paso a paso, te enseñaremos super facil a usar IA gratuita y todo lo que no te cuentan desde RRHH para conseguir empleo facil.</p>
             <div className="hero-bundle-chip">
               <span>OFERTA DE HOY</span><strong>Incluye 5 ebooks extra GRATIS</strong>
               <div className="mobile-activity" aria-label="Actividad de la promoción de hoy">
@@ -271,18 +289,13 @@ function App() {
                 <p>Cambiá tu futuro.</p>
               </div>
             </div>
-            <ul className="hero-benefits">
-              <li><Check aria-hidden="true" /> Desde el primer paso hasta la entrevista</li>
-              <li><Check aria-hidden="true" /> CV, IA, LinkedIn y lugares donde buscar</li>
-              <li><Check aria-hidden="true" /> Fácil de entender, incluso desde tu celular</li>
-            </ul>
+            <AssuranceCard className="hero-assurance-mobile" />
             <div className="price-offer">
-              <div className="regular-price"><span>Precio habitual</span><del>$19.990</del></div>
-              <div className="launch-price"><span>OFERTA DE HOY {offerDay}</span><strong>$8.990</strong></div>
-              <div className="saving-pill">AHORRÁS $11.000</div>
+              <div className="regular-price"><span>Precio habitual</span><del>$26.990</del></div>
+              <div className="launch-price"><span>OFERTA DE HOY {offerDay}</span><strong>$12.990</strong></div>
+              <div className="saving-pill">52% OFF</div>
             </div>
             <div className="hero-primary-cta" ref={heroBuyRef}><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton></div>
-            <div className="hero-trust"><span><ShieldCheck aria-hidden="true" />Compra protegida por Mercado Pago</span><span><LockKeyhole aria-hidden="true" />Un solo pago · acceso de por vida</span></div>
           </div>
         </div>
       </section>
@@ -316,7 +329,7 @@ function App() {
               {guides.slice(1).map((guide) => <figure key={guide.title}><img src={guide.image} alt={guide.title.replace('\n', ' ')} width="1536" height="1024" loading="lazy" decoding="async" /><figcaption>{guide.title.replace('\n', ' ')}</figcaption></figure>)}
             </div>
           </div>
-          <div className="bundle-overview-copy"><p>TODO EN UNA SOLA COMPRA</p><h3>Método Entrevista <span>+ 5 ebooks</span></h3><strong>Hoy los recibís sin pagarlos aparte.</strong><small>Un recorrido completo desde el primer paso de tu búsqueda hasta la preparación para una entrevista.</small><div className="bundle-overview-price"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TODO EL PACK POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small></div><a href="#ebooks-incluidos">Ver ebooks incluidos <ChevronDown aria-hidden="true" /></a></div>
+          <div className="bundle-overview-copy"><p>TODO EN UNA SOLA COMPRA</p><h3>Método Entrevista <span>+ 5 ebooks</span></h3><strong>Hoy los recibís sin pagarlos aparte.</strong><small>Un recorrido completo desde el primer paso de tu búsqueda hasta la preparación para una entrevista.</small><div className="bundle-overview-price"><div><span>PRECIO HABITUAL</span><del>$26.990</del></div><span>TODO EL PACK POR</span><strong>$12.990</strong><small>UN SOLO PAGO</small></div><a href="#ebooks-incluidos">Ver ebooks incluidos <ChevronDown aria-hidden="true" /></a></div>
         </div>
         <div className="bundle-swipe-hint">
           <span>Deslizá para ver los 5 ebooks</span>
@@ -335,7 +348,7 @@ function App() {
           <div className="bundle-final-inner section-shell">
             <div className="bundle-final-label"><span>OFERTA DE HOY {offerDay}</span><strong>6</strong><small>GUÍAS<br />DIGITALES</small></div>
             <div className="bundle-final-message"><h3>Todo el método.<span>Todos los extras.</span></h3><p>Método Entrevista más cinco ebooks para trabajar tu CV, usar IA, comenzar en LinkedIn, buscar oportunidades y prepararte para una entrevista.</p><div className="bonus-crossed-value"><span>LOS 5 EBOOKS EXTRA VALEN</span><del>$46.000</del><strong>HOY VAN GRATIS</strong></div></div>
-            <div className="bundle-final-buy"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TE LLEVÁS TODO POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton><p><ShieldCheck aria-hidden="true" /> Compra protegida por Mercado Pago</p></div>
+            <div className="bundle-final-buy"><div><span>PRECIO HABITUAL</span><del>$26.990</del></div><span>TE LLEVÁS TODO POR</span><strong>$12.990</strong><small>UN SOLO PAGO</small><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton><p><ShieldCheck aria-hidden="true" /> Compra protegida por Mercado Pago</p></div>
           </div>
         </div>
       </section>
@@ -388,7 +401,7 @@ function App() {
           <div className="checkout-copy"><p className="eyebrow">OFERTA DE HOY {offerDay}</p><h2>Tu próxima oportunidad puede empezar por <em>cómo te presentás.</em></h2><p>Recibí Método Entrevista y las cinco guías adicionales en una sola compra.</p>
             <ul><li><Check />6 guías digitales</li><li><Check />Acceso inmediato</li><li><Check />Acceso de por vida</li></ul>
           </div>
-          <div className="checkout-box"><span>OFERTA POR TIEMPO LIMITADO</span><del>$19.990</del><strong>$8.990</strong><small>Pago único · Ahorrás $11.000</small><div className="checkout-bonus">+ 5 EBOOKS GRATIS COMPRANDO AHORA</div><BuyButton inverse onClick={openCheckout}>Comprar ahora con Mercado Pago</BuyButton><p><LockKeyhole size={14} /> Pago protegido por Mercado Pago</p></div>
+          <div className="checkout-box"><span>OFERTA POR TIEMPO LIMITADO</span><del>$26.990</del><strong>$12.990</strong><small>Pago único · Ahorrás $14.000</small><div className="checkout-bonus">+ 5 EBOOKS GRATIS COMPRANDO AHORA</div><BuyButton inverse onClick={openCheckout}>Comprar ahora con Mercado Pago</BuyButton><p><LockKeyhole size={14} /> Pago protegido por Mercado Pago</p></div>
         </div>
       </section>
 
@@ -406,13 +419,19 @@ function App() {
           <span className="modal-kicker">ÚLTIMO PASO ANTES DE PAGAR</span>
           <h2 id="purchase-title">¿A qué correo enviamos tus ebooks?</h2>
           <p>Escribí un correo al que tengas acceso. Ahí vas a recibir Método Entrevista y las otras cinco guías cuando Mercado Pago confirme la compra.</p>
+          <div className="modal-order-summary" aria-label="Resumen de tu compra">
+            <strong>Esto es todo lo que te llevás</strong>
+            <div className="modal-summary-row"><span>Método Entrevista</span><span><del>$26.990</del> <b>$12.990</b></span></div>
+            <div className="modal-summary-row"><span>5 ebooks adicionales</span><span><del>$46.000</del> <b>GRATIS</b></span></div>
+            <div className="modal-summary-total"><span>Total a pagar</span><strong>$12.990</strong></div>
+          </div>
           <form onSubmit={startCheckout}>
             <label htmlFor="checkout-email">Tu correo electrónico</label>
             <div className="email-field"><Mail aria-hidden="true" /><input id="checkout-email" type="email" autoComplete="email" required maxLength="254" placeholder="nombre@correo.com" value={checkoutEmail} onChange={(event) => setCheckoutEmail(event.target.value)} /></div>
             {checkoutState.status === 'error' && <div className="modal-error"><AlertCircle aria-hidden="true" />{checkoutState.message}</div>}
             <button className="modal-pay-button" type="submit" disabled={checkoutState.status === 'loading'}>{checkoutState.status === 'loading' ? <><LoaderCircle className="spin" />Preparando tu compra…</> : <>Continuar a Mercado Pago</>}</button>
           </form>
-          <div className="modal-trust"><span><ShieldCheck />Compra protegida por Mercado Pago</span><span><LockKeyhole />Un solo pago de $8.990</span></div>
+          <div className="modal-trust"><span><ShieldCheck />Compra protegida por Mercado Pago</span><span><LockKeyhole />Un solo pago de $12.990</span></div>
           <p className="purchase-help">¿Problemas con la compra? <a href="mailto:valeriafursten@gmail.com">Escribime a valeriafursten@gmail.com</a></p>
           <small>Usaremos este correo únicamente para gestionar tu compra y enviarte los materiales.</small>
         </section>
@@ -428,7 +447,7 @@ function App() {
         </section>
       </div>}
 
-      {showMobileBuy && <div className="mobile-buy"><button type="button" onClick={openCheckout}>Comprar por $8.990</button></div>}
+      {showMobileBuy && <div className="mobile-buy"><button type="button" onClick={openCheckout}>Comprar por $12.990</button></div>}
     </main>
   )
 }

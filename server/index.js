@@ -22,7 +22,7 @@ const dataDirectory = path.join(projectRoot, 'data')
 const ordersPath = path.join(dataDirectory, 'orders.json')
 const port = Number(process.env.PORT || 3001)
 const host = process.env.HOST || '127.0.0.1'
-const productPrice = 8990
+const productPrice = 12990
 const productCurrency = 'ARS'
 const contactEmail = 'valeriafursten@gmail.com'
 
