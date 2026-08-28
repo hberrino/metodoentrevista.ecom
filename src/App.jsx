@@ -18,6 +18,12 @@ const getInitialPaymentNotice = () => {
 }
 const tickerItems = Array.from({ length: 8 }, (_, index) => index)
 
+// Actualizá estos dos números con las métricas reales de cada día.
+const promotionStats = {
+  claimedToday: 87,
+  viewingNow: 7,
+}
+
 const guides = [
   {
     kicker: 'GUÍA PRINCIPAL · DE PRINCIPIO A FIN', title: 'Método\nEntrevista', image: '/ebook-metodo-entrevista-tapa-blanda.png',
@@ -77,6 +83,16 @@ function BuyButton({ children = 'Quiero recibir el kit completo', inverse = fals
     <button className={`buy-button ${inverse ? 'button-inverse' : ''}`} type="button" onClick={onClick}>
       <span>{children}</span>
     </button>
+  )
+}
+
+function FlipNumber({ value }) {
+  return (
+    <strong className="flip-number" aria-label={String(value)}>
+      {String(value).split('').map((digit, index) => (
+        <span className="flip-digit" style={{ '--flip-delay': `${index * 140}ms` }} aria-hidden="true" key={`${digit}-${index}`}>{digit}</span>
+      ))}
+    </strong>
   )
 }
 
@@ -227,8 +243,19 @@ function App() {
       </div>
 
       <section className="hero relative isolate">
-        <div className="hero-background" aria-hidden="true"><img src="/metodo-entrevista-6-guias-v2.png" alt="" /></div>
+        <div className="hero-background" aria-hidden="true"><img src="/metodo-entrevista-6-guias-v2.png" alt="" width="1774" height="887" fetchPriority="high" decoding="async" /></div>
         <div className="hero-photo-ribbon"><span>SOLO POR HOY {offerDay}</span><strong>5 EBOOKS EXTRA GRATIS</strong></div>
+        <aside className="hero-activity" aria-label="Actividad de la promoción de hoy">
+          <div className="hero-activity-item">
+            <FlipNumber value={promotionStats.claimedToday} />
+            <span>personas aprovecharon<br /><b>la promo de hoy</b></span>
+          </div>
+          <div className="hero-activity-item hero-activity-live">
+            <FlipNumber value={promotionStats.viewingNow} />
+            <span>personas viendo la página<br /><b>ahora mismo</b></span>
+          </div>
+          <p>Cambiá tu futuro.</p>
+        </aside>
         <div className="hero-orb hero-orb-one" aria-hidden="true"></div>
         <div className="hero-orb hero-orb-two" aria-hidden="true"></div>
         <div className="hero-inner section-shell">
@@ -236,7 +263,14 @@ function App() {
             <p className="eyebrow">TU BÚSQUEDA LABORAL, CON UN PLAN CLARO</p>
             <h1><span>Método Entrevista</span><em>La guía para conseguir ese trabajo.</em></h1>
             <p className="hero-lead">Un recorrido simple y paso a paso para mejorar cómo te presentás, encontrar más oportunidades y llegar mejor preparado cuando te llamen.</p>
-            <div className="hero-bundle-chip"><span>OFERTA DE HOY</span><strong>Incluye 5 ebooks extra GRATIS</strong></div>
+            <div className="hero-bundle-chip">
+              <span>OFERTA DE HOY</span><strong>Incluye 5 ebooks extra GRATIS</strong>
+              <div className="mobile-activity" aria-label="Actividad de la promoción de hoy">
+                <div className="mobile-activity-item"><FlipNumber value={promotionStats.claimedToday} /><small>aprovecharon<br />la promo de hoy</small></div>
+                <div className="mobile-activity-item"><FlipNumber value={promotionStats.viewingNow} /><small>viendo la página<br />ahora mismo</small></div>
+                <p>Cambiá tu futuro.</p>
+              </div>
+            </div>
             <ul className="hero-benefits">
               <li><Check aria-hidden="true" /> Desde el primer paso hasta la entrevista</li>
               <li><Check aria-hidden="true" /> CV, IA, LinkedIn y lugares donde buscar</li>
@@ -258,14 +292,14 @@ function App() {
           <div className="transformation-heading"><p className="eyebrow">LO QUE HOY TE FRENA · LO QUE PODÉS CAMBIAR</p><h2>Pasa de esperar sin resultados<br /><em>a seguir un plan y conseguir entrevistas.</em></h2><p>No se trata de mandar más currículums, sino de mejorar cómo te presentás, dónde buscás y cómo te preparás para cada oportunidad.</p></div>
           <div className="transformation-grid">
             <div className="transform-card transform-before">
-              <div className="transform-photo transform-photo-before"><img src="/comparativa-antes-busqueda.png" alt="Persona cansada frente a la computadora durante una búsqueda laboral sin resultados" /><span>ANTES</span></div>
+              <div className="transform-photo transform-photo-before"><img src="/comparativa-antes-busqueda.png" alt="Persona cansada frente a la computadora durante una búsqueda laboral sin resultados" width="1448" height="1086" loading="lazy" decoding="async" /><span>ANTES</span></div>
               <span>SIN UN MÉTODO</span><h3>Errores que te alejan de una entrevista</h3>
               <ul><li>Mandar el mismo CV a todos los trabajos</li><li>No preparar el CV para los filtros ATS</li><li>Buscar siempre en los mismos lugares</li><li>No usar la IA para mejorar tu presentación y ahorrar tiempo</li><li>Postularte sin un plan ni seguimiento</li></ul>
             </div>
             <div className="transform-arrow"><ArrowRight aria-hidden="true" /></div>
             <div className="transform-card transform-after">
-              <div className="transform-photo transform-photo-after"><img src="/comparativa-despues-trabajo.png" alt="Profesional feliz vestido de traje caminando hacia su trabajo" /><span>DESPUÉS</span></div>
-              <span>CON MÉTODO ENTREVISTA</span><h3>El metodo infalible para conseguir empleo</h3>
+              <div className="transform-photo transform-photo-after"><img src="/comparativa-despues-trabajo.png" alt="Profesional feliz vestido de traje caminando hacia su trabajo" width="1448" height="1086" loading="lazy" decoding="async" /><span>DESPUÉS</span></div>
+              <span>CON MÉTODO ENTREVISTA</span><h3>Un método claro para mejorar tus posibilidades</h3>
               <ul><li>Un CV adaptado y más fácil de entender</li><li>Nuevos portales y empresas donde postularte</li><li>Usar IA gratuita para mejorar tu presentación y ahorrar tiempo</li><li>LinkedIn activo y contactos orgánicos</li><li>Más preparación para responder cuando te llamen</li></ul>
             </div>
           </div>
@@ -276,17 +310,21 @@ function App() {
         <div className="section-heading centered-heading"><p className="eyebrow">UNA COMPRA · SEIS GUÍAS</p><h2>Comprás Método Entrevista.<br /><em>Hoy te llevás los otros 5 gratis.</em></h2><p>Un paquete completo para trabajar tu CV, buscar oportunidades, usar IA, empezar en LinkedIn y prepararte para una entrevista.</p></div>
         <div className="bundle-overview">
           <div className="bundle-equation" aria-label="Método Entrevista más cinco ebooks incluidos">
-            <figure className="overview-main-book"><img src={guides[0].image} alt="Libro de tapa blanda Método Entrevista" /><figcaption>GUÍA PRINCIPAL</figcaption></figure>
+            <figure className="overview-main-book"><img src={guides[0].image} alt="Libro de tapa blanda Método Entrevista" width="1536" height="1024" loading="lazy" decoding="async" /><figcaption>GUÍA PRINCIPAL</figcaption></figure>
             <span className="overview-plus" aria-hidden="true">+</span>
             <div className="overview-mini-books">
-              {guides.slice(1).map((guide) => <figure key={guide.title}><img src={guide.image} alt={guide.title.replace('\n', ' ')} /><figcaption>{guide.title.replace('\n', ' ')}</figcaption></figure>)}
+              {guides.slice(1).map((guide) => <figure key={guide.title}><img src={guide.image} alt={guide.title.replace('\n', ' ')} width="1536" height="1024" loading="lazy" decoding="async" /><figcaption>{guide.title.replace('\n', ' ')}</figcaption></figure>)}
             </div>
           </div>
           <div className="bundle-overview-copy"><p>TODO EN UNA SOLA COMPRA</p><h3>Método Entrevista <span>+ 5 ebooks</span></h3><strong>Hoy los recibís sin pagarlos aparte.</strong><small>Un recorrido completo desde el primer paso de tu búsqueda hasta la preparación para una entrevista.</small><div className="bundle-overview-price"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TODO EL PACK POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small></div><a href="#ebooks-incluidos">Ver ebooks incluidos <ChevronDown aria-hidden="true" /></a></div>
         </div>
+        <div className="bundle-swipe-hint">
+          <span>Deslizá para ver los 5 ebooks</span>
+          <ArrowRight aria-hidden="true" />
+        </div>
         <div className="bundle-grid bonus-grid" id="ebooks-incluidos">
           {guides.slice(1).map((guide) => <article className="bundle-card" key={guide.title}>
-            <div className="bundle-book-visual"><img src={guide.image} alt={`Libro de tapa blanda ${guide.title.replace('\n', ' ')}`} /><span>{guide.kicker}</span></div>
+            <div className="bundle-book-visual"><img src={guide.image} alt={`Libro de tapa blanda ${guide.title.replace('\n', ' ')}`} width="1536" height="1024" loading="lazy" decoding="async" /><span>{guide.kicker}</span></div>
             <h3>{guide.title.replace('\n', ' ')}</h3>
             <div className="bonus-value"><div className="bonus-old-price"><span>VALOR INDIVIDUAL</span><del>{guide.value}</del></div><div className="bonus-free-price"><strong>GRATIS</strong><small>al adquirir Método Entrevista</small></div></div>
             <p>{guide.description}</p>
@@ -310,13 +348,13 @@ function App() {
             <article><span><Mail aria-hidden="true" /></span><small>PASO 2</small><h3>Te llega todo por correo</h3><p>Recibís el acceso y la información necesaria para abrir las seis guías.</p></article>
             <article><span><MonitorSmartphone aria-hidden="true" /></span><small>PASO 3</small><h3>Lo ves donde quieras</h3><p>Podés leerlo desde tu celular, tablet, notebook o computadora.</p></article>
           </div>
-          <figure className="delivery-devices"><img src="/acceso-dispositivos-6-ebooks.png" alt="Notebook, tablet y celular mostrando la biblioteca digital con los seis ebooks de Método Entrevista" /><figcaption><span>ACCESO DIGITAL</span><strong>Las seis guías disponibles en cualquier dispositivo</strong></figcaption></figure>
+          <figure className="delivery-devices"><img src="/acceso-dispositivos-6-ebooks.png" alt="Notebook, tablet y celular mostrando la biblioteca digital con los seis ebooks de Método Entrevista" width="1693" height="929" loading="lazy" decoding="async" /><figcaption><span>ACCESO DIGITAL</span><strong>Las seis guías disponibles en cualquier dispositivo</strong></figcaption></figure>
         </div>
       </section>
 
       <section className="reviews-section">
         <div className="section-shell">
-          <div className="section-heading centered-heading"><p className="eyebrow">RESEÑAS DE NUESTROS USUARIOS</p><h2>Ellos eligieron el metodo<br /><em>para mejorar su búsqueda laboral.</em></h2></div>
+          <div className="section-heading centered-heading"><p className="eyebrow">EXPERIENCIAS ILUSTRATIVAS</p><h2>Situaciones reales de búsqueda<br /><em>que el método ayuda a ordenar.</em></h2><p>Ejemplos basados en dificultades y objetivos frecuentes. No representan testimonios verificables de clientes.</p></div>
           <div className="reviews-carousel-head"></div>
           <div className="reviews-track" ref={reviewsTrackRef} tabIndex="0" aria-label="Carrusel de casos" aria-live="off" onMouseEnter={() => { reviewsPausedRef.current = true }} onMouseLeave={() => { reviewsPausedRef.current = false }} onFocus={() => { reviewsPausedRef.current = true }} onBlur={() => { reviewsPausedRef.current = false }} onPointerDown={() => { reviewsPausedRef.current = true }} onPointerUp={() => { reviewsPausedRef.current = false }}>
             {[...exampleReviews, ...exampleReviews].map((review, index) => <article className="review-card" key={`${review.name}-${index}`} data-loop-start={index === exampleReviews.length ? '' : undefined} aria-hidden={index >= exampleReviews.length}>
@@ -330,7 +368,7 @@ function App() {
 
       <section className="author-section">
         <div className="section-shell author-strip">
-          <img className="author-avatar" src="/valeria-fursten.png" alt="Valeria Fursten, psicóloga y recruiter" />
+          <img className="author-avatar" src="/valeria-fursten.png" alt="Valeria Fursten, psicóloga y recruiter" width="1254" height="1254" loading="lazy" decoding="async" />
           <div className="author-copy">
             <p className="eyebrow">CREADO POR UNA PROFESIONAL DE SELECCIÓN</p>
             <h2>Valeria Fursten</h2>

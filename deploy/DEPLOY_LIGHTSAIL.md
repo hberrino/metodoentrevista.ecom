@@ -1,6 +1,6 @@
 # Publicar Método Entrevista en Lightsail
 
-Esta configuración ejecuta Node solamente en `127.0.0.1:3001`. Nginx recibe las visitas públicas y las deriva al proceso, incluyendo `/api/checkout` y `/api/mercadopago/webhook`.
+Esta configuración ejecuta Node solamente en `127.0.0.1:3002`. Nginx recibe las visitas públicas y las deriva al proceso, incluyendo `/api/checkout` y `/api/mercadopago/webhook`. Es independiente de los otros sitios alojados en la misma instancia.
 
 ## 1. Dominio y red
 
@@ -27,29 +27,30 @@ npm run build
 
 Completar `.env` directamente en el servidor. Nunca subirlo a Git ni copiar las claves a archivos públicos.
 
-Variables todavía pendientes:
+La base de producción debe incluir:
 
 ```dotenv
+PUBLIC_URL=https://metodoentrevista.store
+HOST=127.0.0.1
+PORT=3002
 MERCADOPAGO_ACCESS_TOKEN=
 MERCADOPAGO_WEBHOOK_SECRET=
 SMTP_PASS=
 ```
 
-## 3. Mantener Node activo con PM2
+## 3. Mantener Node activo con systemd
 
 ```bash
-sudo npm install -g pm2
-pm2 start ecosystem.config.cjs
-pm2 save
-pm2 startup
+sudo cp deploy/metodoentrevista.service /etc/systemd/system/metodoentrevista.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now metodoentrevista.service
+sudo systemctl status metodoentrevista.service --no-pager
 ```
-
-El último comando mostrará una instrucción adicional con `sudo`; ejecutarla y volver a correr `pm2 save`.
 
 Comprobación local dentro del servidor:
 
 ```bash
-curl http://127.0.0.1:3001/api/health
+curl http://127.0.0.1:3002/api/health
 ```
 
 Debe responder `{"ok":true}`.
@@ -91,7 +92,7 @@ En la aplicación de Mercado Pago:
 3. Seleccionar el evento **Payments**.
 4. Guardar y copiar la firma secreta generada en `MERCADOPAGO_WEBHOOK_SECRET`.
 5. Colocar el Access Token de producción en `MERCADOPAGO_ACCESS_TOKEN`.
-6. Reiniciar el proceso con `pm2 restart metodo-entrevista --update-env`.
+6. Reiniciar el proceso con `sudo systemctl restart metodoentrevista.service`.
 
 Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únicamente después de que el webhook esté firmado y la API confirme pago aprobado, importe de `$8.990` y moneda `ARS`.
 
@@ -100,7 +101,21 @@ Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únic
 1. Activar verificación en dos pasos en `valeriafursten@gmail.com`.
 2. Crear una contraseña de aplicación para correo.
 3. Guardarla en `SMTP_PASS` dentro de `.env`.
-4. Reiniciar con `pm2 restart metodo-entrevista --update-env`.
+4. Reiniciar con `sudo systemctl restart metodoentrevista.service`.
+
+## 8. Activar Cloudflare sin interrumpir pagos
+
+1. Agregar `metodoentrevista.store` a Cloudflare y revisar que haya importado todos los registros DNS existentes.
+2. Cambiar en el registrador los nameservers por los dos asignados por Cloudflare.
+3. En DNS usar `A @ -> 56.125.210.159` y `CNAME www -> metodoentrevista.store`, ambos en modo **Proxied** y TTL **Auto**.
+4. En **SSL/TLS > Overview** elegir **Full (strict)**. Nunca usar Flexible.
+5. Mantener **Rocket Loader desactivado** y activar Brotli.
+6. En **Rules > Redirect Rules**, crear una redirección 301 cuando el hostname sea `www.metodoentrevista.store`. Usar como destino dinámico `concat("https://metodoentrevista.store", http.request.uri.path)` y activar **Preserve query string**.
+7. Crear una regla de caché con URI Path que comience por `/api/` y elegir **Bypass cache**.
+8. No activar desafíos automáticos ni reglas agresivas sobre `/api/mercadopago/webhook`.
+9. Cuando Cloudflare marque el dominio como activo, volver a simular una notificación desde Mercado Pago y comprobar que responde `200`.
+
+La redirección permanente de `www` hacia el dominio sin `www` se realiza en Nginx y también está respaldada por la aplicación.
 
 ## Actualizaciones futuras
 
@@ -108,12 +123,13 @@ Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únic
 cd /var/www/metodoentrevista
 npm ci
 npm run build
-pm2 restart metodo-entrevista --update-env
+sudo systemctl restart metodoentrevista.service
+curl https://metodoentrevista.store/api/health
 ```
 
 Logs útiles:
 
 ```bash
-pm2 logs metodo-entrevista
+sudo journalctl -u metodoentrevista.service --since "10 minutes ago" --no-pager
 sudo tail -f /var/log/nginx/metodoentrevista.error.log
 ```

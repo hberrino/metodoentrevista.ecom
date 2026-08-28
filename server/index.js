@@ -7,8 +7,9 @@ import { fileURLToPath } from 'node:url'
 
 import express from 'express'
 import helmet from 'helmet'
-import MercadoPagoConfig, {
+import {
   InvalidWebhookSignatureError,
+  MercadoPagoConfig,
   Payment,
   Preference,
   WebhookSignatureValidator,
@@ -38,6 +39,12 @@ const app = express()
 app.set('trust proxy', 1)
 app.use(helmet({ contentSecurityPolicy: false }))
 app.use(express.json({ limit: '20kb' }))
+app.use((req, res, next) => {
+  if (req.hostname === 'www.metodoentrevista.store') {
+    return res.redirect(301, `https://metodoentrevista.store${req.originalUrl}`)
+  }
+  return next()
+})
 
 let storeQueue = Promise.resolve()
 
@@ -262,8 +269,17 @@ app.get('/api/orders/:orderId/status', async (req, res) => {
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 const distDirectory = path.join(projectRoot, 'dist')
-app.use(express.static(distDirectory))
-app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(distDirectory, 'index.html')))
+app.use('/assets', express.static(path.join(distDirectory, 'assets'), { maxAge: '1y', immutable: true }))
+app.use(express.static(distDirectory, {
+  maxAge: '1d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('index.html')) res.setHeader('Cache-Control', 'no-cache')
+  },
+}))
+app.get(/^(?!\/api).*/, (_req, res) => {
+  res.setHeader('Cache-Control', 'no-cache')
+  return res.sendFile(path.join(distDirectory, 'index.html'))
+})
 
 app.use((error, _req, res, _next) => {
   console.error(error)
