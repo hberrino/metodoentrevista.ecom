@@ -280,7 +280,7 @@ function App() {
           <div className="hero-copy relative z-10">
             <p className="eyebrow">TU BÚSQUEDA LABORAL, AHORA CON RESULTADOS</p>
             <h1><span>Método Entrevista</span><em>La guía para conseguir ese trabajo.</em></h1>
-            <p className="hero-lead">El paso a paso, te enseñaremos super facil a usar IA gratuita y todo lo que no te cuentan desde RRHH para conseguir empleo facil.</p>
+            <p className="hero-lead">El paso a paso, te enseñaremos super sencillo a usar IA gratuita y todo lo que no te cuentan desde RRHH para conseguir empleo facil.</p>
             <div className="hero-bundle-chip">
               <span>OFERTA DE HOY</span><strong>Incluye 5 ebooks extra GRATIS</strong>
               <div className="mobile-activity" aria-label="Actividad de la promoción de hoy">
