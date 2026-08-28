@@ -1,14 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  ArrowRight, Check, ChevronDown, LockKeyhole, Mail, MonitorSmartphone, ShieldCheck,
+  AlertCircle, ArrowRight, AtSign, Check, CheckCircle2, ChevronDown, LoaderCircle,
+  LockKeyhole, Mail, MonitorSmartphone, ShieldCheck, X,
 } from 'lucide-react'
 import './App.css'
 
-const checkoutUrl = import.meta.env.VITE_MERCADOPAGO_URL || '#comprar'
 const getOfferDay = () => new Intl.DateTimeFormat('es-AR', {
   weekday: 'long',
   timeZone: 'America/Argentina/Buenos_Aires',
 }).format(new Date()).toUpperCase()
+const getInitialPaymentNotice = () => {
+  const params = new URLSearchParams(window.location.search)
+  const purchase = params.get('purchase')
+  if (!purchase) return null
+  if (purchase === 'failure' || !params.get('order') || !params.get('token')) return { status: 'failure', delivered: false }
+  return { status: purchase === 'pending' ? 'pending' : 'checking', delivered: false }
+}
 const tickerItems = Array.from({ length: 8 }, (_, index) => index)
 
 const guides = [
@@ -23,7 +30,7 @@ const guides = [
     points: ['Explicación y aplicación de filtros ATS', 'Adaptar tu CV a cada trabajo', 'Modelos y diseños estratégicos'],
   },
   {
-    kicker: 'EBOOK INCLUIDO', title: 'IA para buscar\ntrabajo', image: '/ebook-ia-trabajo-tapa-blanda.png', value: '$12.000',
+    kicker: 'EBOOK INCLUIDO', title: 'IA aplicada a\nconseguir empleo', image: '/ebook-ia-trabajo-tapa-blanda.png', value: '$12.000',
     description: 'Usá herramientas gratuitas de inteligencia artificial para ahorrar tiempo y organizar mejor tu búsqueda.',
     points: ['Qué herramientas de IA gratuitas usar', 'Mensajes listos para copiar y enviar a la IA', 'Funciones para acelerar tu búsqueda laboral'],
   },
@@ -33,7 +40,7 @@ const guides = [
     points: ['Crear tu perfil paso a paso, fácil y rápido', 'Conseguir contactos orgánicos en poco tiempo', 'Plan de 15 minutos al día para crecer'],
   },
   {
-    kicker: 'EBOOK INCLUIDO', title: 'Dónde buscar\ntrabajo', image: '/ebook-donde-buscar-tapa-blanda.png', value: '$5.000',
+    kicker: 'EBOOK INCLUIDO', title: 'Guía de\nempleos', image: '/ebook-donde-buscar-tapa-blanda.png', value: '$5.000',
     description: 'Ampliá tu búsqueda con páginas, empresas y lugares concretos donde encontrar oportunidades.',
     points: ['Portales de trabajo', 'Páginas de empresas', 'Cómo reconocer avisos dudosos'],
   },
@@ -65,23 +72,117 @@ const faqs = [
   ['¿Método Entrevista garantiza que voy a conseguir trabajo?', 'No. Ninguna guía puede garantizar una contratación. Método Entrevista te ayuda a mejorar cómo te presentás, ampliar tu búsqueda y prepararte mejor para aumentar tus posibilidades.'],
 ]
 
-function BuyButton({ children = 'Quiero recibir el kit completo', inverse = false }) {
+function BuyButton({ children = 'Quiero recibir el kit completo', inverse = false, onClick }) {
   return (
-    <a className={`buy-button ${inverse ? 'button-inverse' : ''}`} href={checkoutUrl}>
+    <button className={`buy-button ${inverse ? 'button-inverse' : ''}`} type="button" onClick={onClick}>
       <span>{children}</span>
-    </a>
+    </button>
   )
 }
 
 function App() {
   const [offerDay, setOfferDay] = useState(getOfferDay)
+  const [showMobileBuy, setShowMobileBuy] = useState(false)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [checkoutEmail, setCheckoutEmail] = useState('')
+  const [checkoutState, setCheckoutState] = useState({ status: 'idle', message: '' })
+  const [paymentNotice, setPaymentNotice] = useState(getInitialPaymentNotice)
   const reviewsTrackRef = useRef(null)
   const reviewsPausedRef = useRef(false)
+  const heroBuyRef = useRef(null)
 
   useEffect(() => {
     const refreshOfferDay = window.setInterval(() => setOfferDay(getOfferDay()), 30000)
     return () => window.clearInterval(refreshOfferDay)
   }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const purchase = params.get('purchase')
+    const orderId = params.get('order')
+    const token = params.get('token')
+    if (!purchase || purchase === 'failure' || !orderId || !token) return undefined
+
+    let stopped = false
+    let attempts = 0
+    let timeout
+    const checkOrder = async () => {
+      try {
+        const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}/status?token=${encodeURIComponent(token)}`)
+        if (!response.ok) throw new Error('No se pudo consultar la compra.')
+        const order = await response.json()
+        if (stopped) return
+        if (order.status === 'approved') {
+          setPaymentNotice({ status: 'approved', delivered: order.delivered })
+          return
+        }
+        if (['rejected', 'cancelled'].includes(order.status)) {
+          setPaymentNotice({ status: 'failure', delivered: false })
+          return
+        }
+        attempts += 1
+        if (attempts >= 24) {
+          setPaymentNotice({ status: 'pending', delivered: false })
+          return
+        }
+        timeout = window.setTimeout(checkOrder, 2500)
+      } catch {
+        if (!stopped) setPaymentNotice({ status: 'pending', delivered: false })
+      }
+    }
+    checkOrder()
+    return () => {
+      stopped = true
+      window.clearTimeout(timeout)
+    }
+  }, [])
+
+  useEffect(() => {
+    let animationFrame
+    const updateMobileBuy = () => {
+      window.cancelAnimationFrame(animationFrame)
+      animationFrame = window.requestAnimationFrame(() => {
+        const heroBuy = heroBuyRef.current
+        const isMobile = window.matchMedia('(max-width: 600px)').matches
+        setShowMobileBuy(Boolean(isMobile && heroBuy && heroBuy.getBoundingClientRect().bottom < 42))
+      })
+    }
+    updateMobileBuy()
+    window.addEventListener('scroll', updateMobileBuy, { passive: true })
+    window.addEventListener('resize', updateMobileBuy)
+    return () => {
+      window.cancelAnimationFrame(animationFrame)
+      window.removeEventListener('scroll', updateMobileBuy)
+      window.removeEventListener('resize', updateMobileBuy)
+    }
+  }, [])
+
+  const openCheckout = () => {
+    setCheckoutState({ status: 'idle', message: '' })
+    setCheckoutOpen(true)
+  }
+
+  const closePaymentNotice = () => {
+    setPaymentNotice(null)
+    window.history.replaceState({}, '', `${window.location.pathname}${window.location.hash}`)
+  }
+
+  const startCheckout = async (event) => {
+    event.preventDefault()
+    setCheckoutState({ status: 'loading', message: '' })
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: checkoutEmail }),
+      })
+      const result = await response.json()
+      if (!response.ok || !result.checkoutUrl) throw new Error(result.error || 'No pudimos iniciar el pago.')
+      window.location.assign(result.checkoutUrl)
+    } catch (error) {
+      setCheckoutState({ status: 'error', message: error.message })
+    }
+  }
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
@@ -146,7 +247,7 @@ function App() {
               <div className="launch-price"><span>OFERTA DE HOY {offerDay}</span><strong>$8.990</strong></div>
               <div className="saving-pill">AHORRÁS $11.000</div>
             </div>
-            <BuyButton>Comprar Método Entrevista por $8.990</BuyButton>
+            <div className="hero-primary-cta" ref={heroBuyRef}><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton></div>
             <div className="hero-trust"><span><ShieldCheck aria-hidden="true" />Compra protegida por Mercado Pago</span><span><LockKeyhole aria-hidden="true" />Un solo pago · acceso de por vida</span></div>
           </div>
         </div>
@@ -154,17 +255,17 @@ function App() {
 
       <section className="transformation-section">
         <div className="section-shell">
-          <div className="transformation-heading"><p className="eyebrow">LO QUE HOY TE FRENA · LO QUE PODÉS CAMBIAR</p><h2>Pasá de buscar sin saber qué corregir<br /><em>a seguir un plan claro.</em></h2><p>No se trata de mandar más currículums, sino de mejorar cómo te presentás, dónde buscás y cómo te preparás para cada oportunidad.</p></div>
+          <div className="transformation-heading"><p className="eyebrow">LO QUE HOY TE FRENA · LO QUE PODÉS CAMBIAR</p><h2>Pasa de esperar sin resultados<br /><em>a seguir un plan y conseguir entrevistas.</em></h2><p>No se trata de mandar más currículums, sino de mejorar cómo te presentás, dónde buscás y cómo te preparás para cada oportunidad.</p></div>
           <div className="transformation-grid">
             <div className="transform-card transform-before">
               <div className="transform-photo transform-photo-before"><img src="/comparativa-antes-busqueda.png" alt="Persona cansada frente a la computadora durante una búsqueda laboral sin resultados" /><span>ANTES</span></div>
-              <span>SIN UN MÉTODO</span><h3>Errores que pueden estar alejándote de una entrevista</h3>
+              <span>SIN UN MÉTODO</span><h3>Errores que te alejan de una entrevista</h3>
               <ul><li>Mandar el mismo CV a todos los trabajos</li><li>No preparar el CV para los filtros ATS</li><li>Buscar siempre en los mismos lugares</li><li>No usar la IA para mejorar tu presentación y ahorrar tiempo</li><li>Postularte sin un plan ni seguimiento</li></ul>
             </div>
             <div className="transform-arrow"><ArrowRight aria-hidden="true" /></div>
             <div className="transform-card transform-after">
               <div className="transform-photo transform-photo-after"><img src="/comparativa-despues-trabajo.png" alt="Profesional feliz vestido de traje caminando hacia su trabajo" /><span>DESPUÉS</span></div>
-              <span>CON MÉTODO ENTREVISTA</span><h3>Una búsqueda más clara y preparada para avanzar</h3>
+              <span>CON MÉTODO ENTREVISTA</span><h3>El metodo infalible para conseguir empleo</h3>
               <ul><li>Un CV adaptado y más fácil de entender</li><li>Nuevos portales y empresas donde postularte</li><li>Usar IA gratuita para mejorar tu presentación y ahorrar tiempo</li><li>LinkedIn activo y contactos orgánicos</li><li>Más preparación para responder cuando te llamen</li></ul>
             </div>
           </div>
@@ -196,7 +297,7 @@ function App() {
           <div className="bundle-final-inner section-shell">
             <div className="bundle-final-label"><span>OFERTA DE HOY {offerDay}</span><strong>6</strong><small>GUÍAS<br />DIGITALES</small></div>
             <div className="bundle-final-message"><h3>Todo el método.<span>Todos los extras.</span></h3><p>Método Entrevista más cinco ebooks para trabajar tu CV, usar IA, comenzar en LinkedIn, buscar oportunidades y prepararte para una entrevista.</p><div className="bonus-crossed-value"><span>LOS 5 EBOOKS EXTRA VALEN</span><del>$46.000</del><strong>HOY VAN GRATIS</strong></div></div>
-            <div className="bundle-final-buy"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TE LLEVÁS TODO POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small><BuyButton>Quiero el método completo</BuyButton><p><ShieldCheck aria-hidden="true" /> Compra protegida por Mercado Pago</p></div>
+            <div className="bundle-final-buy"><div><span>PRECIO HABITUAL</span><del>$19.990</del></div><span>TE LLEVÁS TODO POR</span><strong>$8.990</strong><small>UN SOLO PAGO</small><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton><p><ShieldCheck aria-hidden="true" /> Compra protegida por Mercado Pago</p></div>
           </div>
         </div>
       </section>
@@ -215,16 +316,15 @@ function App() {
 
       <section className="reviews-section">
         <div className="section-shell">
-          <div className="section-heading centered-heading"><p className="eyebrow">SITUACIONES ILUSTRATIVAS</p><h2>Así puede ayudarte a ordenar<br /><em>tu búsqueda laboral.</em></h2><p>Ejemplos ficticios creados para mostrar experiencias posibles con el contenido del método.</p></div>
-          <div className="reviews-carousel-head"><p>Experiencias que se muestran automáticamente</p></div>
-          <div className="reviews-track" ref={reviewsTrackRef} tabIndex="0" aria-label="Carrusel automático de nueve casos ilustrativos" aria-live="off" onMouseEnter={() => { reviewsPausedRef.current = true }} onMouseLeave={() => { reviewsPausedRef.current = false }} onFocus={() => { reviewsPausedRef.current = true }} onBlur={() => { reviewsPausedRef.current = false }} onPointerDown={() => { reviewsPausedRef.current = true }} onPointerUp={() => { reviewsPausedRef.current = false }}>
+          <div className="section-heading centered-heading"><p className="eyebrow">RESEÑAS DE NUESTROS USUARIOS</p><h2>Ellos eligieron el metodo<br /><em>para mejorar su búsqueda laboral.</em></h2></div>
+          <div className="reviews-carousel-head"></div>
+          <div className="reviews-track" ref={reviewsTrackRef} tabIndex="0" aria-label="Carrusel de casos" aria-live="off" onMouseEnter={() => { reviewsPausedRef.current = true }} onMouseLeave={() => { reviewsPausedRef.current = false }} onFocus={() => { reviewsPausedRef.current = true }} onBlur={() => { reviewsPausedRef.current = false }} onPointerDown={() => { reviewsPausedRef.current = true }} onPointerUp={() => { reviewsPausedRef.current = false }}>
             {[...exampleReviews, ...exampleReviews].map((review, index) => <article className="review-card" key={`${review.name}-${index}`} data-loop-start={index === exampleReviews.length ? '' : undefined} aria-hidden={index >= exampleReviews.length}>
               <div className="review-stars" aria-label="Cinco estrellas">★★★★★</div>
               <blockquote>“{review.message}”</blockquote>
-              <div className="review-person"><span aria-hidden="true">{review.initials}</span><div><strong>{review.name}</strong><small>{review.age} años · Caso ilustrativo</small></div></div>
+              <div className="review-person"><span aria-hidden="true">{review.initials}</span><div><strong>{review.name}</strong><small>{review.age} años </small></div></div>
             </article>)}
           </div>
-          <p className="reviews-disclaimer">Los nombres, edades y comentarios de esta sección son ficticios. No representan testimonios reales ni garantizan resultados laborales.</p>
         </div>
       </section>
 
@@ -250,12 +350,47 @@ function App() {
           <div className="checkout-copy"><p className="eyebrow">OFERTA DE HOY {offerDay}</p><h2>Tu próxima oportunidad puede empezar por <em>cómo te presentás.</em></h2><p>Recibí Método Entrevista y las cinco guías adicionales en una sola compra.</p>
             <ul><li><Check />6 guías digitales</li><li><Check />Acceso inmediato</li><li><Check />Acceso de por vida</li></ul>
           </div>
-          <div className="checkout-box"><span>OFERTA POR TIEMPO LIMITADO</span><del>$19.990</del><strong>$8.990</strong><small>Pago único · Ahorrás $11.000</small><div className="checkout-bonus">+ 5 EBOOKS GRATIS COMPRANDO AHORA</div><BuyButton inverse>Comprar ahora con Mercado Pago</BuyButton><p><LockKeyhole size={14} /> Pago protegido por Mercado Pago</p></div>
+          <div className="checkout-box"><span>OFERTA POR TIEMPO LIMITADO</span><del>$19.990</del><strong>$8.990</strong><small>Pago único · Ahorrás $11.000</small><div className="checkout-bonus">+ 5 EBOOKS GRATIS COMPRANDO AHORA</div><BuyButton inverse onClick={openCheckout}>Comprar ahora con Mercado Pago</BuyButton><p><LockKeyhole size={14} /> Pago protegido por Mercado Pago</p></div>
         </div>
       </section>
 
-      <footer><div className="section-shell footer-inner"><strong>MÉTODO ENTREVISTA</strong><p>© {new Date().getFullYear()} Valeria Fursten</p><small>Método Entrevista brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo.</small></div></footer>
-      <div className="mobile-buy"><a href={checkoutUrl}>Comprar por $8.990</a></div>
+      <footer>
+        <div className="section-shell footer-inner">
+          <div className="footer-brand"><strong>MÉTODO ENTREVISTA</strong><p>Herramientas claras para ordenar y mejorar tu búsqueda laboral.</p></div>
+          <div className="footer-contact"><span>CONTACTO Y RECLAMOS</span><a href="mailto:valeriafursten@gmail.com"><Mail aria-hidden="true" />valeriafursten@gmail.com</a><a href="https://instagram.com/psic.valeriafursten" target="_blank" rel="noreferrer"><AtSign aria-hidden="true" />@psic.valeriafursten</a></div>
+          <div className="footer-bottom"><p>© {new Date().getFullYear()} Valeria Fursten</p><small>Método Entrevista brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo.</small></div>
+        </div>
+      </footer>
+
+      {checkoutOpen && <div className="purchase-modal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && checkoutState.status !== 'loading') setCheckoutOpen(false) }}>
+        <section className="purchase-dialog" role="dialog" aria-modal="true" aria-labelledby="purchase-title">
+          <button className="modal-close" type="button" aria-label="Cerrar" disabled={checkoutState.status === 'loading'} onClick={() => setCheckoutOpen(false)}><X /></button>
+          <span className="modal-kicker">ÚLTIMO PASO ANTES DE PAGAR</span>
+          <h2 id="purchase-title">¿A qué correo enviamos tus ebooks?</h2>
+          <p>Escribí un correo al que tengas acceso. Ahí vas a recibir Método Entrevista y las otras cinco guías cuando Mercado Pago confirme la compra.</p>
+          <form onSubmit={startCheckout}>
+            <label htmlFor="checkout-email">Tu correo electrónico</label>
+            <div className="email-field"><Mail aria-hidden="true" /><input id="checkout-email" type="email" autoComplete="email" required maxLength="254" placeholder="nombre@correo.com" value={checkoutEmail} onChange={(event) => setCheckoutEmail(event.target.value)} /></div>
+            {checkoutState.status === 'error' && <div className="modal-error"><AlertCircle aria-hidden="true" />{checkoutState.message}</div>}
+            <button className="modal-pay-button" type="submit" disabled={checkoutState.status === 'loading'}>{checkoutState.status === 'loading' ? <><LoaderCircle className="spin" />Preparando tu compra…</> : <>Continuar a Mercado Pago</>}</button>
+          </form>
+          <div className="modal-trust"><span><ShieldCheck />Compra protegida por Mercado Pago</span><span><LockKeyhole />Un solo pago de $8.990</span></div>
+          <p className="purchase-help">¿Problemas con la compra? <a href="mailto:valeriafursten@gmail.com">Escribime a valeriafursten@gmail.com</a></p>
+          <small>Usaremos este correo únicamente para gestionar tu compra y enviarte los materiales.</small>
+        </section>
+      </div>}
+
+      {paymentNotice && <div className="purchase-modal payment-modal" role="presentation">
+        <section className="purchase-dialog payment-dialog" role="dialog" aria-modal="true" aria-labelledby="payment-status-title">
+          <button className="modal-close" type="button" aria-label="Cerrar" onClick={closePaymentNotice}><X /></button>
+          {paymentNotice.status === 'approved' ? <CheckCircle2 className="status-icon status-success" /> : paymentNotice.status === 'failure' ? <AlertCircle className="status-icon status-error" /> : <LoaderCircle className="status-icon status-pending spin" />}
+          <h2 id="payment-status-title">{paymentNotice.status === 'approved' ? '¡Pago confirmado!' : paymentNotice.status === 'failure' ? 'El pago no se completó' : paymentNotice.status === 'checking' ? 'Estamos confirmando tu pago' : 'Tu pago está pendiente'}</h2>
+          <p>{paymentNotice.status === 'approved' ? paymentNotice.delivered ? 'Tus seis ebooks ya fueron enviados al correo que ingresaste. Revisá también la carpeta de spam o promociones.' : 'Tus ebooks están en proceso de envío. En unos momentos los vas a recibir en el correo que ingresaste.' : paymentNotice.status === 'failure' ? 'No se realizó ningún envío. Podés volver a intentarlo cuando quieras.' : 'Mercado Pago todavía está procesando la operación. Cuando quede aprobada, enviaremos automáticamente los seis ebooks a tu correo.'}</p>
+          <button className="modal-secondary-button" type="button" onClick={closePaymentNotice}>{paymentNotice.status === 'failure' ? 'Volver a la página' : 'Entendido'}</button>
+        </section>
+      </div>}
+
+      {showMobileBuy && <div className="mobile-buy"><button type="button" onClick={openCheckout}>Comprar por $8.990</button></div>}
     </main>
   )
 }

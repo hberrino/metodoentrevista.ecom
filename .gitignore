@@ -1,24 +1,64 @@
-# Logs
-logs
+# Logs and running processes
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.pid
+*.pid.lock
+.pm2/
 
-node_modules
-dist
-dist-ssr
+# Dependencies and generated builds
+node_modules/
+dist/
+dist-ssr/
+coverage/
+.nyc_output/
+.vite/
+.cache/
+*.tsbuildinfo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
 *.local
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Purchases and local persistence
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Private delivery files and deployment archives
+ebooks/
+private/
+*.zip
+*.tar
+*.tar.gz
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
