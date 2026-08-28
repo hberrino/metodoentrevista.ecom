@@ -1,49 +1,32 @@
 # Método Entrevista
 
-Landing de venta con React/Vite y servidor Node/Express para Checkout Pro de Mercado Pago y entrega automática por correo.
+Método Entrevista es un e-commerce de productos digitales orientado a la búsqueda laboral. La plataforma comercializa un paquete compuesto por una guía principal y cinco ebooks complementarios, mediante una landing page diseñada para presentar el contenido y completar la compra en un único recorrido.
 
-## Desarrollo local
+## Arquitectura
 
-1. Copiar `.env.example` como `.env` y completar las variables.
-2. Instalar dependencias con `npm install`.
-3. En una terminal ejecutar `npm run server`.
-4. En otra terminal ejecutar `npm run dev`.
+El frontend es una aplicación web desarrollada con React y Vite, con una interfaz responsive optimizada para desktop y dispositivos móviles. El backend utiliza Node.js y Express y funciona como API, servidor de archivos estáticos y punto de recepción de notificaciones externas.
 
-Vite abre la landing en `http://localhost:5173` y deriva las solicitudes `/api` al servidor de `http://localhost:3001`.
+La aplicación se ejecuta como un único servicio y está compuesta por:
 
-## Flujo de la compra
+- React 19, Vite y Tailwind CSS para la interfaz.
+- Node.js y Express para la lógica del servidor.
+- Mercado Pago Checkout Pro para procesar los pagos.
+- Webhooks firmados para confirmar las operaciones directamente con Mercado Pago.
+- Nodemailer y Gmail SMTP para el envío automático de los accesos.
+- Google Drive como biblioteca de entrega de los seis ebooks.
+- Persistencia local de órdenes para registrar el estado del pago y evitar entregas duplicadas.
+- Helmet, validación de datos y límites de solicitudes para reforzar la seguridad de la API.
 
-1. El comprador ingresa obligatoriamente su correo en el modal.
-2. El servidor crea una preferencia de Checkout Pro y lo redirige a Mercado Pago.
-3. Mercado Pago notifica el pago mediante el webhook firmado.
-4. El servidor consulta el pago y verifica estado `approved`, importe, moneda y referencia interna.
-5. Recién entonces envía por correo los seis enlaces configurados.
-6. La pantalla de regreso consulta el estado y muestra si los ebooks fueron enviados o están en proceso.
+## Flujo de compra
 
-## Configuración de Mercado Pago
+El comprador ingresa su correo y es redirigido a Mercado Pago. Cuando la operación es aprobada, Mercado Pago notifica al servidor mediante un webhook firmado. El backend consulta la operación y valida el estado, el importe, la moneda y la referencia de la orden antes de enviar por correo el enlace de acceso a la biblioteca digital.
 
-- Crear una aplicación de Checkout Pro en Mercado Pago Developers.
-- Copiar el Access Token en `MERCADOPAGO_ACCESS_TOKEN`.
-- En **Webhooks > Configurar notificaciones**, registrar `https://tudominio.com/api/mercadopago/webhook`.
-- Seleccionar el evento **Payments** y copiar la firma secreta generada en `MERCADOPAGO_WEBHOOK_SECRET`.
-- Probar primero con las credenciales y cuentas de prueba.
-- El Access Token y la firma nunca deben guardarse en variables `VITE_` ni exponerse en el navegador.
+La entrega sólo se registra como completada después de que el proveedor de correo confirma el envío, y cada orden aprobada se procesa una única vez.
 
-## Google Drive y correo
+## Infraestructura
 
-- Subir los seis PDF a una carpeta de Drive y habilitar **Cualquier persona con el enlace: lector**.
-- Pegar el enlace de la carpeta en `EBOOK_FOLDER_URL`. El correo tendrá un único botón **Abrir mis 6 ebooks**.
-- Como alternativa, se pueden configurar seis enlaces separados mediante las variables `EBOOK_*_URL`.
-- Para enviar desde Gmail, activar verificación en dos pasos y crear una contraseña de aplicación para `SMTP_PASS`.
-- Los enlaces de Drive pueden ser compartidos por el comprador. Para enlaces privados de un solo uso se necesita almacenamiento con URLs firmadas, por ejemplo Amazon S3.
+El proyecto está alojado en una instancia Ubuntu de Amazon Lightsail y se encuentra publicado en [metodoentrevista.store](https://metodoentrevista.store). Nginx funciona como proxy inverso, el proceso de Node.js es administrado por systemd y el dominio utiliza HTTPS mediante un certificado de Let's Encrypt.
 
-## Publicación en Lightsail
+## Contenido y posicionamiento
 
-```bash
-npm run build
-npm start
-```
-
-El servidor sirve la carpeta `dist`, la API y el webhook desde un mismo proceso. El dominio debe tener HTTPS. Conviene ejecutar Node con un administrador de procesos como PM2 y usar Nginx como proxy inverso.
-
-La guía exacta para `metodoentrevista.store`, incluyendo DNS, PM2, Nginx, Certbot y el webhook de Mercado Pago, está en [`deploy/DEPLOY_LIGHTSAIL.md`](deploy/DEPLOY_LIGHTSAIL.md).
+Además del flujo de comercio electrónico, el sitio incluye metadatos para buscadores y redes sociales, datos estructurados de producto y preguntas frecuentes, sitemap, reglas para rastreadores y recursos gráficos optimizados para compartir la página.
