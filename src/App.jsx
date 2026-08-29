@@ -17,6 +17,44 @@ const getInitialPaymentNotice = () => {
   return { status: purchase === 'pending' ? 'pending' : 'checking', delivered: false }
 }
 const tickerItems = Array.from({ length: 8 }, (_, index) => index)
+const metaProduct = {
+  content_ids: ['metodo-entrevista-pack'],
+  content_name: 'Método Entrevista + 5 ebooks',
+  content_type: 'product',
+  currency: 'ARS',
+  value: 12990,
+}
+
+const getCookie = (name) => document.cookie.split('; ').find((item) => item.startsWith(`${name}=`))?.slice(name.length + 1) || null
+
+function initializeMetaPixel(pixelId) {
+  if (!pixelId || window.__metodoEntrevistaMetaPixel) return
+  const fbq = window.fbq || function metaPixelQueue(...args) {
+    if (fbq.callMethod) fbq.callMethod(...args)
+    else fbq.queue.push(args)
+  }
+  if (!window.fbq) {
+    window.fbq = fbq
+    window._fbq = fbq
+    fbq.push = fbq
+    fbq.loaded = true
+    fbq.version = '2.0'
+    fbq.queue = []
+    const script = document.createElement('script')
+    script.async = true
+    script.src = 'https://connect.facebook.net/en_US/fbevents.js'
+    document.head.appendChild(script)
+  }
+  window.fbq('init', pixelId)
+  window.__metodoEntrevistaMetaPixel = pixelId
+}
+
+function trackMetaEvent(name, data, eventId) {
+  if (!window.fbq) return
+  if (eventId) window.fbq('track', name, data || {}, { eventID: eventId })
+  else if (data) window.fbq('track', name, data)
+  else window.fbq('track', name)
+}
 
 // Actualizá estos dos números con las métricas reales de cada día.
 const promotionStats = {
@@ -118,9 +156,43 @@ function App() {
   const [checkoutEmail, setCheckoutEmail] = useState('')
   const [checkoutState, setCheckoutState] = useState({ status: 'idle', message: '' })
   const [paymentNotice, setPaymentNotice] = useState(getInitialPaymentNotice)
+  const [metaConfig, setMetaConfig] = useState({ pixelId: null })
+  const [approvedPurchaseEventId, setApprovedPurchaseEventId] = useState(null)
   const reviewsTrackRef = useRef(null)
   const reviewsPausedRef = useRef(false)
   const heroBuyRef = useRef(null)
+  const metaPageTrackedRef = useRef(false)
+
+  useEffect(() => {
+    let stopped = false
+    fetch('/api/config')
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((config) => { if (!stopped) setMetaConfig({ pixelId: config.metaPixelId || null }) })
+      .catch(() => { if (!stopped) setMetaConfig({ pixelId: null }) })
+    return () => { stopped = true }
+  }, [])
+
+  useEffect(() => {
+    if (!metaConfig.pixelId || metaPageTrackedRef.current) return
+    initializeMetaPixel(metaConfig.pixelId)
+    trackMetaEvent('PageView')
+    trackMetaEvent('ViewContent', metaProduct)
+    metaPageTrackedRef.current = true
+  }, [metaConfig.pixelId])
+
+  useEffect(() => {
+    if (!approvedPurchaseEventId || !metaConfig.pixelId) return
+    const storageKey = `meta_purchase_${approvedPurchaseEventId}`
+    try {
+      if (window.localStorage.getItem(storageKey)) return
+      initializeMetaPixel(metaConfig.pixelId)
+      trackMetaEvent('Purchase', metaProduct, approvedPurchaseEventId)
+      window.localStorage.setItem(storageKey, 'sent')
+    } catch {
+      initializeMetaPixel(metaConfig.pixelId)
+      trackMetaEvent('Purchase', metaProduct, approvedPurchaseEventId)
+    }
+  }, [approvedPurchaseEventId, metaConfig.pixelId])
 
   useEffect(() => {
     const refreshOfferDay = window.setInterval(() => setOfferDay(getOfferDay()), 30000)
@@ -144,6 +216,7 @@ function App() {
         const order = await response.json()
         if (stopped) return
         if (order.status === 'approved') {
+          if (order.purchaseEventId) setApprovedPurchaseEventId(order.purchaseEventId)
           setPaymentNotice({ status: 'approved', delivered: order.delivered })
           return
         }
@@ -205,10 +278,15 @@ function App() {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: checkoutEmail }),
+        body: JSON.stringify({
+          email: checkoutEmail,
+          fbp: getCookie('_fbp'),
+          fbc: getCookie('_fbc'),
+        }),
       })
       const result = await response.json()
       if (!response.ok || !result.checkoutUrl) throw new Error(result.error || 'No pudimos iniciar el pago.')
+      trackMetaEvent('InitiateCheckout', { ...metaProduct, num_items: 1 }, result.orderId ? `checkout-${result.orderId}` : undefined)
       window.location.assign(result.checkoutUrl)
     } catch (error) {
       setCheckoutState({ status: 'error', message: error.message })
@@ -409,7 +487,7 @@ function App() {
         <div className="section-shell footer-inner">
           <div className="footer-brand"><strong>MÉTODO ENTREVISTA</strong><p>Herramientas claras para ordenar y mejorar tu búsqueda laboral.</p></div>
           <div className="footer-contact"><span>CONTACTO Y RECLAMOS</span><a href="mailto:valeriafursten@gmail.com"><Mail aria-hidden="true" />valeriafursten@gmail.com</a><a href="https://instagram.com/psic.valeriafursten" target="_blank" rel="noreferrer"><AtSign aria-hidden="true" />@psic.valeriafursten</a></div>
-          <div className="footer-bottom"><p>© {new Date().getFullYear()} Valeria Fursten</p><small>Método Entrevista brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo.</small></div>
+          <div className="footer-bottom"><p>© {new Date().getFullYear()} Valeria Fursten</p><small>Método Entrevista brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo. Este sitio utiliza herramientas de Meta para medir visitas, inicios de compra y compras confirmadas.</small></div>
         </div>
       </footer>
 

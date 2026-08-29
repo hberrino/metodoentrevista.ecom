@@ -24,6 +24,7 @@ const port = Number(process.env.PORT || 3001)
 const host = process.env.HOST || '127.0.0.1'
 const productPrice = 12990
 const productCurrency = 'ARS'
+const productId = 'metodo-entrevista-pack'
 const contactEmail = 'valeriafursten@gmail.com'
 
 const ebookLinks = [
@@ -81,6 +82,13 @@ function isValidEmail(value) {
   return typeof value === 'string' && value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
+function trackingCookie(value, prefix) {
+  if (typeof value !== 'string' || value.length > 255 || !value.startsWith(prefix)) return null
+  return /^[A-Za-z0-9._-]+$/.test(value) ? value : null
+}
+
+const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex')
+
 function publicUrl() {
   const value = String(process.env.PUBLIC_URL || '').replace(/\/$/, '')
   if (!/^https:\/\//i.test(value) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(value)) {
@@ -93,6 +101,55 @@ function mercadoPagoClients() {
   if (!process.env.MERCADOPAGO_ACCESS_TOKEN) throw new Error('Falta MERCADOPAGO_ACCESS_TOKEN.')
   const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN })
   return { preference: new Preference(client), payment: new Payment(client) }
+}
+
+async function sendMetaPurchase(order, payment) {
+  const pixelId = String(process.env.META_PIXEL_ID || '').trim()
+  const accessToken = String(process.env.META_CONVERSIONS_API_TOKEN || '').trim()
+  if (!pixelId || !accessToken) return false
+
+  const userData = { em: [sha256(order.email.trim().toLowerCase())] }
+  if (order.clientIp) userData.client_ip_address = order.clientIp
+  if (order.userAgent) userData.client_user_agent = order.userAgent
+  if (order.fbp) userData.fbp = order.fbp
+  if (order.fbc) userData.fbc = order.fbc
+
+  const approvedAt = Date.parse(payment.date_approved || '')
+  const payload = {
+    data: [{
+      event_name: 'Purchase',
+      event_time: Math.floor((Number.isFinite(approvedAt) ? approvedAt : Date.now()) / 1000),
+      event_source_url: `${publicUrl()}/`,
+      event_id: order.purchaseEventId,
+      action_source: 'website',
+      user_data: userData,
+      custom_data: {
+        currency: productCurrency,
+        value: productPrice,
+        content_ids: [productId],
+        content_type: 'product',
+        contents: [{ id: productId, quantity: 1, item_price: productPrice }],
+        num_items: 1,
+      },
+    }],
+  }
+  if (process.env.META_TEST_EVENT_CODE) payload.test_event_code = process.env.META_TEST_EVENT_CODE
+
+  const graphVersion = String(process.env.META_GRAPH_API_VERSION || 'v23.0').trim()
+  const response = await fetch(`https://graph.facebook.com/${graphVersion}/${encodeURIComponent(pixelId)}/events`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10000),
+  })
+  const result = await response.json().catch(() => ({}))
+  if (!response.ok || result.events_received !== 1) {
+    throw new Error(result.error?.message || `Meta Conversions API respondió ${response.status}.`)
+  }
+  return true
 }
 
 function mailTransport() {
@@ -166,6 +223,16 @@ async function processApprovedPayment(paymentId) {
     return
   }
 
+  if (!order.metaPurchaseSentAt) {
+    try {
+      const sent = await sendMetaPurchase(order, payment)
+      if (sent) await updateOrder(orderId, { metaPurchaseSentAt: new Date().toISOString(), metaPurchaseError: null })
+    } catch (error) {
+      await updateOrder(orderId, { metaPurchaseError: error.message })
+      console.error('No se pudo informar la compra a Meta:', error)
+    }
+  }
+
   const delivery = await claimDelivery(orderId)
   if (!delivery) return
   try {
@@ -199,12 +266,13 @@ app.post('/api/checkout', checkoutRateLimit, async (req, res) => {
 
     const baseUrl = publicUrl()
     const orderId = crypto.randomUUID()
+    const purchaseEventId = `purchase-${orderId}`
     const statusToken = crypto.randomBytes(24).toString('hex')
     const returnQuery = `order=${encodeURIComponent(orderId)}&token=${encodeURIComponent(statusToken)}`
     const { preference } = mercadoPagoClients()
     const result = await preference.create({
       body: {
-        items: [{ id: 'metodo-entrevista-pack', title: 'Método Entrevista + 5 ebooks', quantity: 1, currency_id: productCurrency, unit_price: productPrice }],
+        items: [{ id: productId, title: 'Método Entrevista + 5 ebooks', quantity: 1, currency_id: productCurrency, unit_price: productPrice }],
         payer: { email },
         external_reference: orderId,
         metadata: { order_id: orderId },
@@ -226,10 +294,15 @@ app.post('/api/checkout', checkoutRateLimit, async (req, res) => {
       statusToken,
       status: 'created',
       preferenceId: result.id,
+      purchaseEventId,
+      fbp: trackingCookie(req.body?.fbp, 'fb.1.'),
+      fbc: trackingCookie(req.body?.fbc, 'fb.1.'),
+      clientIp: req.ip,
+      userAgent: String(req.get('user-agent') || '').slice(0, 500) || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
-    return res.status(201).json({ checkoutUrl: result.init_point })
+    return res.status(201).json({ checkoutUrl: result.init_point, orderId, purchaseEventId })
   } catch (error) {
     console.error('No se pudo crear la compra:', error)
     return res.status(503).json({ error: 'No pudimos iniciar el pago. Intentá nuevamente en unos minutos.' })
@@ -263,8 +336,12 @@ app.post('/api/mercadopago/webhook', (req, res) => {
 app.get('/api/orders/:orderId/status', async (req, res) => {
   const order = await getOrder(req.params.orderId)
   if (!order || req.query.token !== order.statusToken) return res.status(404).json({ error: 'Compra no encontrada.' })
-  return res.json({ status: order.status, delivered: Boolean(order.deliveredAt) })
+  return res.json({ status: order.status, delivered: Boolean(order.deliveredAt), purchaseEventId: order.purchaseEventId })
 })
+
+app.get('/api/config', (_req, res) => res.json({
+  metaPixelId: String(process.env.META_PIXEL_ID || '').trim() || null,
+}))
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 

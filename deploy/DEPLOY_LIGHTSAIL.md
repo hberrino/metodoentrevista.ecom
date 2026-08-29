@@ -35,6 +35,10 @@ HOST=127.0.0.1
 PORT=3002
 MERCADOPAGO_ACCESS_TOKEN=
 MERCADOPAGO_WEBHOOK_SECRET=
+META_PIXEL_ID=
+META_CONVERSIONS_API_TOKEN=
+META_GRAPH_API_VERSION=v23.0
+META_TEST_EVENT_CODE=
 SMTP_PASS=
 ```
 
@@ -94,7 +98,19 @@ En la aplicación de Mercado Pago:
 5. Colocar el Access Token de producción en `MERCADOPAGO_ACCESS_TOKEN`.
 6. Reiniciar el proceso con `sudo systemctl restart metodoentrevista.service`.
 
-Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únicamente después de que el webhook esté firmado y la API confirme pago aprobado, importe de `$8.990` y moneda `ARS`.
+Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únicamente después de que el webhook esté firmado y la API confirme pago aprobado, importe de `$12.990` y moneda `ARS`.
+
+## Meta Pixel y Conversions API
+
+1. Crear un origen de datos web en el Administrador de eventos de Meta.
+2. Copiar su identificador en `META_PIXEL_ID`.
+3. Generar un token de Conversions API y guardarlo en `META_CONVERSIONS_API_TOKEN`.
+4. Durante las pruebas, copiar el código de "Probar eventos" en `META_TEST_EVENT_CODE`.
+5. Reiniciar el servicio después de editar `.env`.
+6. Verificar `PageView`, `ViewContent`, `InitiateCheckout` y `Purchase` en "Probar eventos".
+7. Vaciar `META_TEST_EVENT_CODE` y reiniciar el servicio antes de activar la campaña real.
+
+El navegador carga el Pixel al ingresar. La compra se envía también desde el servidor una vez que Mercado Pago confirma estado, importe y moneda. Navegador y servidor comparten el mismo `event_id` para que Meta deduplique el evento `Purchase`.
 
 ## 7. Activar el envío desde Gmail
 
