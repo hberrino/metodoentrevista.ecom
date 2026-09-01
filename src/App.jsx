@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  AlertCircle, ArrowRight, AtSign, Check, CheckCircle2, ChevronDown, LoaderCircle,
+  AlertCircle, AtSign, Check, CheckCircle2, ChevronDown, LoaderCircle,
   LockKeyhole, Mail, MonitorSmartphone, ShieldCheck, X,
 } from 'lucide-react'
 import './App.css'
@@ -18,11 +18,11 @@ const getInitialPaymentNotice = () => {
 }
 const tickerItems = Array.from({ length: 8 }, (_, index) => index)
 const metaProduct = {
-  content_ids: ['metodo-entrevista-pack'],
-  content_name: 'Método Entrevista + 5 ebooks',
+  content_ids: ['cv-resultados-reales'],
+  content_name: 'CV para resultados reales + 2 ebooks de regalo',
   content_type: 'product',
   currency: 'ARS',
-  value: 12990,
+  value: 14900,
 }
 
 const getCookie = (name) => document.cookie.split('; ').find((item) => item.startsWith(`${name}=`))?.slice(name.length + 1) || null
@@ -56,64 +56,26 @@ function trackMetaEvent(name, data, eventId) {
   else window.fbq('track', name)
 }
 
-// Actualizá estos dos números con las métricas reales de cada día.
-const promotionStats = {
-  claimedToday: 87,
-  viewingNow: 7,
-}
-
-const guides = [
-  {
-    kicker: 'GUÍA PRINCIPAL · DE PRINCIPIO A FIN', title: 'Método\nEntrevista', image: '/ebook-metodo-entrevista-tapa-blanda.png',
-    description: 'El recorrido completo, explicado paso a paso: desde decidir qué trabajo buscar y preparar cómo vas a presentarte, hasta enviar postulaciones, hacer seguimiento y afrontar una entrevista con mayor preparación.',
-    points: ['Definir qué trabajo buscar y organizar tu plan', 'Preparar tu CV, perfil y presentación', 'Postularte y hacer seguimiento sin perder oportunidades', 'Prepararte para la entrevista y los próximos pasos'],
-  },
-  {
-    kicker: 'EBOOK INCLUIDO', title: 'CV listo para\npostularte', image: '/ebook-cv-listo-tapa-blanda.png', value: '$8.000',
-    description: 'Aprendé a preparar un CV claro, estratégico y adaptado a las búsquedas laborales actuales.',
-    points: ['Explicación y aplicación de filtros ATS', 'Adaptar tu CV a cada trabajo', 'Modelos y diseños estratégicos'],
-  },
-  {
-    kicker: 'EBOOK INCLUIDO', title: 'IA aplicada a\nconseguir empleo', image: '/ebook-ia-trabajo-tapa-blanda.png', value: '$12.000',
-    description: 'Usá herramientas gratuitas de inteligencia artificial para ahorrar tiempo y organizar mejor tu búsqueda.',
-    points: ['Qué herramientas de IA gratuitas usar', 'Mensajes listos para copiar y enviar a la IA', 'Funciones para acelerar tu búsqueda laboral'],
-  },
-  {
-    kicker: 'EBOOK INCLUIDO', title: 'LinkedIn\ndesde cero', image: '/ebook-linkedin-tapa-blanda.png', value: '$14.000',
-    description: 'Creá tu perfil desde cero de manera fácil y empezá a crecer sin pagar publicidad.',
-    points: ['Crear tu perfil paso a paso, fácil y rápido', 'Conseguir contactos orgánicos en poco tiempo', 'Plan de 15 minutos al día para crecer'],
-  },
-  {
-    kicker: 'EBOOK INCLUIDO', title: 'Guía de\nempleos', image: '/ebook-donde-buscar-tapa-blanda.png', value: '$5.000',
-    description: 'Ampliá tu búsqueda con páginas, empresas y lugares concretos donde encontrar oportunidades.',
-    points: ['Portales de trabajo', 'Páginas de empresas', 'Cómo reconocer avisos dudosos'],
-  },
-  {
-    kicker: 'EBOOK INCLUIDO', title: 'Preparación para\nentrevistas', image: '/ebook-entrevistas-tapa-blanda.png', value: '$7.000',
-    description: 'Llegá al llamado con respuestas pensadas y más seguridad para contar lo que sabés hacer.',
-    points: ['Preguntas frecuentes', 'Ejemplos de respuestas', 'Qué hacer antes y después'],
-  },
-]
-
-const exampleReviews = [
-  { name: 'Camila Benítez', age: 27, initials: 'CB', message: 'Me ayudó a ordenar mi búsqueda y entender qué tenía que cambiar en mi CV sin palabras complicadas.' },
-  { name: 'Julián Romero', age: 34, initials: 'JR', message: 'LinkedIn siempre me parecía difícil. Con la guía pude armar mi perfil y empezar a generar contactos con un plan claro.' },
-  { name: 'Mariana López', age: 42, initials: 'ML', message: 'Lo que más me sirvió fue tener ejemplos concretos para adaptar el CV y prepararme antes de una entrevista.' },
-  { name: 'Lucía Ferreyra', age: 30, initials: 'LF', message: 'Pude dejar de mandar siempre el mismo currículum y aprendí una forma sencilla de adaptarlo a cada búsqueda.' },
-  { name: 'Pablo Medina', age: 38, initials: 'PM', message: 'La parte de inteligencia artificial está explicada desde cero y me dio ideas concretas para practicar respuestas.' },
-  { name: 'Rocío Álvarez', age: 24, initials: 'RA', message: 'Me gustó tener todas las páginas y pasos en un solo lugar. Antes no sabía por dónde empezar a buscar.' },
-  { name: 'Sergio Duarte', age: 46, initials: 'SD', message: 'Las explicaciones son directas. Pude revisar mi experiencia y presentarla de una manera mucho más clara.' },
-  { name: 'Natalia Acosta', age: 32, initials: 'NA', message: 'El plan de LinkedIn me resultó fácil de seguir y me ayudó a entender cómo crear contactos sin pagar publicidad.' },
-  { name: 'Martín Sosa', age: 29, initials: 'MS', message: 'Las preguntas de entrevista y los ejemplos me sirvieron para practicar y llegar con las ideas más ordenadas.' },
+const programSteps = [
+  ['01', 'Encontrá tu objetivo de postulación', 'Elegí la vacante concreta a la que querés aplicar para trabajar con una dirección clara.'],
+  ['02', 'Compartí la vacante y tu información con la IA', 'Ingresá los requisitos del empleo junto con tu experiencia, estudios y habilidades relevantes.'],
+  ['03', 'Usá los prompts adecuados', 'Aplicá instrucciones listas para adaptar el contenido y crear un CV específico para esa oportunidad.'],
+  ['04', 'Revisá el CV contra filtros ATS', 'Comprobá su estructura, palabras clave y aspectos importantes, y corregí lo que pueda frenarlo.'],
+  ['05', 'Descargá tu nuevo CV en PDF', 'Guardá una versión profesional, ordenada y personalizada, lista para compartir.'],
+  ['06', 'Postulate al empleo', 'Enviá el CV creado especialmente para esa vacante y completá tu postulación.'],
+  ['07', 'Repetí el proceso con cada vacante', 'Volvé a usar el método para generar nuevas versiones sin empezar otra vez desde cero.'],
 ]
 
 const faqs = [
-  ['¿Cómo recibo las guías?', 'Después de acreditarse el pago vas a recibir el acceso en el correo que uses para comprar. Podrás abrir y guardar todos los materiales.'],
-  ['¿Puedo hacerlo desde el celular?', 'Sí. Las guías están pensadas para leerse desde el celular y los pasos indican qué herramientas usar. Para editar ciertos modelos de CV también podés utilizar una computadora si tenés acceso a una.'],
-  ['¿Necesito saber usar LinkedIn o inteligencia artificial?', 'No. Ambos materiales empiezan desde cero, con explicaciones sencillas y ejemplos para seguir paso a paso.'],
-  ['¿Sirve si tengo poca experiencia?', 'Sí. Incluye formas de mostrar estudios, tareas, trabajos informales y habilidades sin inventar información.'],
+  ['¿Cómo recibo los ebooks?', 'Después de acreditarse el pago vas a recibir en tu correo el acceso a CV para resultados reales, LinkedIn desde cero y Preparación para entrevistas. Podrás abrirlos y guardarlos.'],
+  ['¿Sirve si nunca hice un CV?', 'Sí. El contenido empieza desde una hoja en blanco y explica cada sección de manera simple, sin asumir conocimientos previos.'],
+  ['¿Y si ya tengo experiencia o un CV armado?', 'También sirve. Vas a aprender a revisar lo que ya tenés, destacar resultados y adaptar el contenido a cada vacante.'],
+  ['¿Necesito pagar una herramienta de inteligencia artificial?', 'No. El método está pensado para utilizar opciones gratuitas. No necesitás contratar suscripciones ni programas adicionales.'],
+  ['¿Sirve para cualquier edad?', 'Sí. La lógica de construcción y adaptación se puede aplicar en diferentes etapas laborales, con poca o mucha experiencia.'],
+  ['¿Qué son los filtros ATS?', 'Son sistemas que algunas empresas utilizan para ordenar y leer postulaciones. El ebook explica cómo preparar un CV claro y compatible, sin prometer resultados automáticos.'],
+  ['¿Qué ebooks están incluidos de regalo?', 'Por tiempo limitado recibís LinkedIn desde cero, valuado en $12.000, y Preparación para entrevistas, valuado en $7.000, sin costo adicional.'],
   ['¿Es un pago único?', 'Sí. Pagás una vez y conservás el acceso a los materiales, sin abonos mensuales.'],
-  ['¿Método Entrevista garantiza que voy a conseguir trabajo?', 'No. Ninguna guía puede garantizar una contratación. Método Entrevista te ayuda a mejorar cómo te presentás, ampliar tu búsqueda y prepararte mejor para aumentar tus posibilidades.'],
+  ['¿El ebook garantiza que voy a conseguir trabajo?', 'No. Ningún material puede garantizar una contratación. CV para resultados reales te enseña a presentar mejor tu perfil y postularte con una estrategia más clara.'],
 ]
 
 function BuyButton({ children = 'Quiero recibir el kit completo', inverse = false, onClick }) {
@@ -121,31 +83,6 @@ function BuyButton({ children = 'Quiero recibir el kit completo', inverse = fals
     <button className={`buy-button ${inverse ? 'button-inverse' : ''}`} type="button" onClick={onClick}>
       <span>{children}</span>
     </button>
-  )
-}
-
-function FlipNumber({ value }) {
-  return (
-    <strong className="flip-number" aria-label={String(value)}>
-      {String(value).split('').map((digit, index) => (
-        <span className="flip-digit" style={{ '--flip-delay': `${index * 140}ms` }} aria-hidden="true" key={`${digit}-${index}`}>{digit}</span>
-      ))}
-    </strong>
-  )
-}
-
-function AssuranceCard({ className = '' }) {
-  return (
-    <div className={`hero-assurance-card ${className}`.trim()}>
-      <strong><LockKeyhole aria-hidden="true" /> Compra rápida, segura y sin complicaciones</strong>
-      <ul>
-        <li><b>Pago protegido</b> mediante Mercado Pago.</li>
-        <li><b>Descarga inmediata</b> al acreditarse el pago.</li>
-        <li><b>Acceso de por vida</b> para consultarlo cuando quieras.</li>
-        <li><b>Compatible</b> con celular, PC o tablet.</li>
-        <li className="hero-buyers"><b>+700 personas</b> ya compraron nuestros ebooks.</li>
-      </ul>
-    </div>
   )
 }
 
@@ -158,8 +95,6 @@ function App() {
   const [paymentNotice, setPaymentNotice] = useState(getInitialPaymentNotice)
   const [metaConfig, setMetaConfig] = useState({ pixelId: null })
   const [approvedPurchaseEventId, setApprovedPurchaseEventId] = useState(null)
-  const reviewsTrackRef = useRef(null)
-  const reviewsPausedRef = useRef(false)
   const heroBuyRef = useRef(null)
   const metaPageTrackedRef = useRef(false)
 
@@ -293,32 +228,9 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
-    let animationFrame
-    let previousTime = performance.now()
-    let autoPosition = reviewsTrackRef.current?.scrollLeft || 0
-    const animateReviews = (currentTime) => {
-      const track = reviewsTrackRef.current
-      const elapsed = Math.min(currentTime - previousTime, 50)
-      previousTime = currentTime
-      if (track && !reviewsPausedRef.current && !document.hidden) {
-        const loopStart = track.querySelector('[data-loop-start]')?.offsetLeft
-        autoPosition += 24 * (elapsed / 1000)
-        if (loopStart && autoPosition >= loopStart) autoPosition -= loopStart
-        track.scrollLeft = autoPosition
-      } else if (track) {
-        autoPosition = track.scrollLeft
-      }
-      animationFrame = window.requestAnimationFrame(animateReviews)
-    }
-    animationFrame = window.requestAnimationFrame(animateReviews)
-    return () => window.cancelAnimationFrame(animationFrame)
-  }, [])
-
   return (
     <main>
-      <div className="offer-strip" aria-label={`Oferta de hoy ${offerDay}: 52% de descuento y 5 ebooks de regalo`}>
+      <div className="offer-strip" aria-label={`Oferta de hoy ${offerDay}: 50% de descuento y dos ebooks de regalo`}>
         <div className="ticker-track">
           {tickerItems.map((item) => (
             <div className="ticker-item" key={item} aria-hidden={item > 0}>
@@ -326,7 +238,7 @@ function App() {
               <span>OFERTA DE HOY</span>
               <strong>{offerDay}</strong>
               <span className="strip-dot">•</span>
-              <span>52% OFF + 5 EBOOKS DE REGALO</span>
+              <span>50% OFF + 2 EBOOKS DE REGALO</span>
               <span className="ticker-gift">🎁</span>
               <span className="strip-dot">•</span>
               <span>ACCESO INMEDIATO</span>
@@ -335,136 +247,107 @@ function App() {
         </div>
       </div>
 
-      <section className="hero relative isolate">
-        <div className="hero-background" aria-hidden="true"><img src="/metodo-entrevista-6-guias-v2.png" alt="" width="1774" height="887" fetchPriority="high" decoding="async" /></div>
-        <div className="hero-photo-ribbon"><span>SOLO POR HOY {offerDay}</span><strong>5 EBOOKS EXTRA GRATIS</strong></div>
-        <aside className="hero-side" aria-label="Información de compra y actividad de la promoción">
-          <AssuranceCard className="hero-assurance-desktop" />
-          <div className="hero-activity">
-            <div className="hero-activity-item">
-              <FlipNumber value={promotionStats.claimedToday} />
-              <span>personas aprovecharon<br /><b>la promo de hoy</b></span>
+      <section className="cv2-hero relative isolate">
+        <div className="section-shell cv2-hero-grid">
+          <div className="cv2-copy">
+            <p className="eyebrow">NECESITAS UN CV PARA CADA POSTULACIÓN.</p>
+            <h1>La guía para crear<strong>CV´s para cada empleo en segundos.</strong></h1>
+            <p className="cv2-lead">Aprendé a generar una versión personalizada para cada empleo al que quieras postularte, usando herramientas simples y gratuitas.</p>
+
+            <div className="cv2-social-proof"><span aria-hidden="true"></span><strong>+457</strong> ya saben crear CV en segundos</div>
+
+            <div className="cv2-highlight" aria-label="A quién está dirigida la guía">
+              <span><Check />No importa tu edad</span>
+              <span><Check />Con mucha o poca experiencia</span>
+              <span><Check />Fácil y rápido</span>
             </div>
-            <div className="hero-activity-item hero-activity-live">
-              <FlipNumber value={promotionStats.viewingNow} />
-              <span>personas viendo la página<br /><b>ahora mismo</b></span>
+
+            <p className="cv2-includes"><b>Todo explicado dentro de la guía:</b> IA gratuita, adaptación del contenido, filtros ATS, diseños y enlaces directos para buscar trabajo. Sin aplicaciones pagas ni costos extra.</p>
+
+            <div className="cv2-buy-row">
+              <div className="cv-price-row"><div><small>Precio habitual</small><del>$29.900</del></div><div><small>OFERTA DE HOY</small><strong>$14.900</strong></div><span>50% OFF</span></div>
+              <div className="cv-hero-action" ref={heroBuyRef}><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton></div>
             </div>
-            <p>Cambiá tu futuro.</p>
+            <div className="cv2-trust"><span><Check />Pago por Mercado Pago</span><span><Check />Acceso de por vida</span><span><Check />2 ebooks de regalo</span></div>
           </div>
-        </aside>
-        <div className="hero-orb hero-orb-one" aria-hidden="true"></div>
-        <div className="hero-orb hero-orb-two" aria-hidden="true"></div>
-        <div className="hero-inner section-shell">
-          <div className="hero-copy relative z-10">
-            <p className="eyebrow">TU BÚSQUEDA LABORAL, AHORA CON RESULTADOS</p>
-            <h1><span>Método Entrevista</span><em>La guía para conseguir ese trabajo.</em></h1>
-            <p className="hero-lead">El paso a paso, te enseñaremos super sencillo a usar IA gratuita y todo lo que no te cuentan desde RRHH para conseguir empleo facil.</p>
-            <div className="hero-bundle-chip">
-              <span>OFERTA DE HOY</span><strong>Incluye 5 ebooks extra GRATIS</strong>
-              <div className="mobile-activity" aria-label="Actividad de la promoción de hoy">
-                <div className="mobile-activity-item"><FlipNumber value={promotionStats.claimedToday} /><small>aprovecharon<br />la promo de hoy</small></div>
-                <div className="mobile-activity-item"><FlipNumber value={promotionStats.viewingNow} /><small>viendo la página<br />ahora mismo</small></div>
-                <p>Cambiá tu futuro.</p>
-              </div>
-            </div>
-            <AssuranceCard className="hero-assurance-mobile" />
-            <div className="price-offer">
-              <div className="regular-price"><span>Precio habitual</span><del>$26.990</del></div>
-              <div className="launch-price"><span>OFERTA DE HOY {offerDay}</span><strong>$12.990</strong></div>
-              <div className="saving-pill">52% OFF</div>
-            </div>
-            <div className="hero-primary-cta" ref={heroBuyRef}><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton></div>
+
+          <div className="cv2-visual" role="img" aria-label="CV para resultados reales con LinkedIn desde cero y Preparación para entrevistas">
+            <img src="/cv-productos-hero.png" alt="" width="1536" height="1536" decoding="async" />
+            <span className="cv2-float-tag tag-ats">Filtros ATS</span>
+            <span className="cv2-float-tag tag-ia">Prompts IA</span>
+            <span className="cv2-float-tag tag-fast">Fácil y rápido</span>
+            <span className="cv2-float-tag tag-all">Para todos</span>
+            <span className="cv2-float-tag tag-noexp">Sin experiencia</span>
+            <span className="cv2-float-tag tag-custom">CV personalizado</span>
           </div>
         </div>
       </section>
 
-      <section className="transformation-section">
+      <section className="cv-pain-section">
         <div className="section-shell">
-          <div className="transformation-heading"><p className="eyebrow">LO QUE HOY TE FRENA · LO QUE PODÉS CAMBIAR</p><h2>Pasa de esperar sin resultados<br /><em>a seguir un plan y conseguir entrevistas.</em></h2><p>No se trata de mandar más currículums, sino de mejorar cómo te presentás, dónde buscás y cómo te preparás para cada oportunidad.</p></div>
-          <div className="transformation-grid">
-            <div className="transform-card transform-before">
-              <div className="transform-photo transform-photo-before"><img src="/comparativa-antes-busqueda.png" alt="Persona cansada frente a la computadora durante una búsqueda laboral sin resultados" width="1448" height="1086" loading="lazy" decoding="async" /><span>ANTES</span></div>
-              <span>SIN UN MÉTODO</span><h3>Errores que te alejan de una entrevista</h3>
-              <ul><li>Mandar el mismo CV a todos los trabajos</li><li>No preparar el CV para los filtros ATS</li><li>Buscar siempre en los mismos lugares</li><li>No usar la IA para mejorar tu presentación y ahorrar tiempo</li><li>Postularte sin un plan ni seguimiento</li></ul>
-            </div>
-            <div className="transform-arrow"><ArrowRight aria-hidden="true" /></div>
-            <div className="transform-card transform-after">
-              <div className="transform-photo transform-photo-after"><img src="/comparativa-despues-trabajo.png" alt="Profesional feliz vestido de traje caminando hacia su trabajo" width="1448" height="1086" loading="lazy" decoding="async" /><span>DESPUÉS</span></div>
-              <span>CON MÉTODO ENTREVISTA</span><h3>Un método claro para mejorar tus posibilidades</h3>
-              <ul><li>Un CV adaptado y más fácil de entender</li><li>Nuevos portales y empresas donde postularte</li><li>Usar IA gratuita para mejorar tu presentación y ahorrar tiempo</li><li>LinkedIn activo y contactos orgánicos</li><li>Más preparación para responder cuando te llamen</li></ul>
+          <div className="cv-pain-heading">
+            <p className="eyebrow">EL PROBLEMA NO ES TU EXPERIENCIA</p>
+            <h2>¿Por qué la guía<br /><em>es tan efectiva?</em></h2>
+            <p className="parrafo-uno">Porque corrige lo que está haciendo que no te entrevisten.<span aria-hidden="true">↓</span></p>
+          </div>
+
+          <div className="cv-pain-grid">
+            <figure className="cv-pain-example">
+              <div className="cv-pain-image">
+                <img src="/cv-generico-ejemplo.jpg" alt="Ejemplo ilustrativo de un currículum genérico con diseño complejo" width="600" height="800" loading="lazy" decoding="async" />
+                <span><X aria-hidden="true" />CV GENÉRICO</span>
+              </div>
+              <figcaption><strong>NUNCA USES ESTAS PLANTILLAS</strong><p>Pueden verse atractivos, pero su estructura compleja dificulta la lectura automática y no se adapta a cada vacante.</p></figcaption>
+            </figure>
+
+            <div className="cv-pain-points">
+              <article><span>x</span><div><h3>Los filtros ATS te descartan</h3><p>Sin una estructura y palabras clave adecuadas, tu CV puede quedar afuera antes de que lo lea una persona.</p></div></article>
+              <article><span>x</span><div><h3>Tener un unico CV general</h3><p>Enviar siempre el mismo documento ignora lo que cada empresa y cada propuesta están buscando.</p></div></article>
+              <article><span>x</span><div><h3>No conocer las herramientas</h3><p>Vas a aprender qué opciones gratuitas usar para crear y adaptar tus versiones sin pagar aplicaciones extra.</p></div></article>
+              <article><span>x</span><div><h3>Presentas mal tu experiencia</h3><p>Tengas mucha o poca información, la diferencia está en cómo la ordenás, la explicás y la enfocás.</p></div></article>
+              <article className="cv-pain-solution"><span>05</span><div><h3>La IA se convierte en tu aliada</h3><p>Usada correctamente, de forma gratuita te permite personalizar cada CV en segundos y aumentar tus posibilidades de conseguir empleo.</p></div></article>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bundle-section section-shell">
-        <div className="section-heading centered-heading"><p className="eyebrow">UNA COMPRA · SEIS GUÍAS</p><h2>Comprás Método Entrevista.<br /><em>Hoy te llevás los otros 5 gratis.</em></h2><p>Un paquete completo para trabajar tu CV, buscar oportunidades, usar IA, empezar en LinkedIn y prepararte para una entrevista.</p></div>
-        <div className="bundle-overview">
-          <div className="bundle-equation" aria-label="Método Entrevista más cinco ebooks incluidos">
-            <figure className="overview-main-book"><img src={guides[0].image} alt="Libro de tapa blanda Método Entrevista" width="1536" height="1024" loading="lazy" decoding="async" /><figcaption>GUÍA PRINCIPAL</figcaption></figure>
-            <span className="overview-plus" aria-hidden="true">+</span>
-            <div className="overview-mini-books">
-              {guides.slice(1).map((guide) => <figure key={guide.title}><img src={guide.image} alt={guide.title.replace('\n', ' ')} width="1536" height="1024" loading="lazy" decoding="async" /><figcaption>{guide.title.replace('\n', ' ')}</figcaption></figure>)}
-            </div>
+      <section className="cv-bonus-section" id="ebooks-incluidos">
+        <div className="section-shell">
+          <div className="section-heading centered-heading light-heading"><p className="eyebrow">UNA COMPRA · TRES RECURSOS</p><h2>El CV es el centro.<br /><em>Los regalos completan tu recorrido.</em></h2><p>Primero conseguí una presentación sólida. Después fortalecé tu perfil en LinkedIn y preparate para cuando llegue la entrevista.</p></div>
+          <div className="cv-bonus-grid">
+            <article className="cv-bonus-main"><span>PRODUCTO PRINCIPAL</span><div className="cv-bonus-main-image"><img src="/cv-resultados-book-realista.png" alt="Libro CV para resultados reales" width="1214" height="1295" loading="lazy" decoding="async" /></div><div><h3>Todo lo necesario para crear y adaptar tu CV</h3><p>Desde cero, con ATS, IA gratuita, portales de empleo y un sistema reutilizable.</p><div className="cv-card-price cv-main-price"><small>VALOR HABITUAL</small><div><del>$29.900</del><strong>50% OFF</strong></div></div></div></article>
+            <article className="cv-bonus-card"><span>REGALO 1</span><img src="/ebook-linkedin-tapa-blanda.png" alt="LinkedIn desde cero" width="1536" height="1024" loading="lazy" decoding="async" /><div><h3>LinkedIn desde cero</h3><p>Armá tu perfil y aprendé una rutina simple para desarrollar tu presencia profesional.</p><div className="cv-card-price cv-free-price"><del>$12.000</del><strong>GRATIS</strong></div></div></article>
+            <article className="cv-bonus-card"><span>REGALO 2</span><img src="/ebook-entrevistas-tapa-blanda.png" alt="Preparación para entrevistas" width="1536" height="1024" loading="lazy" decoding="async" /><div><h3>Preparación para entrevistas</h3><p>Ordená tus respuestas y preparate mejor para contar lo que sabés hacer.</p><div className="cv-card-price cv-free-price"><del>$7.000</del><strong>GRATIS</strong></div></div></article>
           </div>
-          <div className="bundle-overview-copy"><p>TODO EN UNA SOLA COMPRA</p><h3>Método Entrevista <span>+ 5 ebooks</span></h3><strong>Hoy los recibís sin pagarlos aparte.</strong><small>Un recorrido completo desde el primer paso de tu búsqueda hasta la preparación para una entrevista.</small><div className="bundle-overview-price"><div><span>PRECIO HABITUAL</span><del>$26.990</del></div><span>TODO EL PACK POR</span><strong>$12.990</strong><small>UN SOLO PAGO</small></div><a href="#ebooks-incluidos">Ver ebooks incluidos <ChevronDown aria-hidden="true" /></a></div>
+          <div className="cv-value-box"><div><small>VALOR TOTAL DE LOS 3 EBOOKS</small><del>$48.900</del></div><div><small>HOY, EN UN SOLO PAGO</small><strong>$14.900</strong><span>AHORRÁS $34.000</span></div><BuyButton onClick={openCheckout}>Acceder a la oferta</BuyButton></div>
         </div>
-        <div className="bundle-swipe-hint">
-          <span>Deslizá para ver los 5 ebooks</span>
-          <ArrowRight aria-hidden="true" />
-        </div>
-        <div className="bundle-grid bonus-grid" id="ebooks-incluidos">
-          {guides.slice(1).map((guide) => <article className="bundle-card" key={guide.title}>
-            <div className="bundle-book-visual"><img src={guide.image} alt={`Libro de tapa blanda ${guide.title.replace('\n', ' ')}`} width="1536" height="1024" loading="lazy" decoding="async" /><span>{guide.kicker}</span></div>
-            <h3>{guide.title.replace('\n', ' ')}</h3>
-            <div className="bonus-value"><div className="bonus-old-price"><span>VALOR INDIVIDUAL</span><del>{guide.value}</del></div><div className="bonus-free-price"><strong>GRATIS</strong><small>al adquirir Método Entrevista</small></div></div>
-            <p>{guide.description}</p>
-            <ul>{guide.points.map((point) => <li key={point}><Check aria-hidden="true" />{point}</li>)}</ul>
-          </article>)}
-        </div>
-        <div className="bundle-final-offer">
-          <div className="bundle-final-inner section-shell">
-            <div className="bundle-final-label"><span>OFERTA DE HOY {offerDay}</span><strong>6</strong><small>GUÍAS<br />DIGITALES</small></div>
-            <div className="bundle-final-message"><h3>Todo el método.<span>Todos los extras.</span></h3><p>Método Entrevista más cinco ebooks para trabajar tu CV, usar IA, comenzar en LinkedIn, buscar oportunidades y prepararte para una entrevista.</p><div className="bonus-crossed-value"><span>LOS 5 EBOOKS EXTRA VALEN</span><del>$46.000</del><strong>HOY VAN GRATIS</strong></div></div>
-            <div className="bundle-final-buy"><div><span>PRECIO HABITUAL</span><del>$26.990</del></div><span>TE LLEVÁS TODO POR</span><strong>$12.990</strong><small>UN SOLO PAGO</small><BuyButton onClick={openCheckout}>Comprar por Mercado Pago</BuyButton><p><ShieldCheck aria-hidden="true" /> Compra protegida por Mercado Pago</p></div>
-          </div>
-        </div>
+      </section>
+
+      <section className="cv-program-section section-shell">
+        <div className="section-heading centered-heading"><p className="eyebrow">DE LA HOJA EN BLANCO A TU PRÓXIMA POSTULACIÓN</p><h2>Lo vas a hacer paso a paso.<br /><em>Y después vas a poder repetirlo.</em></h2></div>
+        <div className="cv-program-list">{programSteps.map(([number, title, text]) => <article key={number}><strong>{number}</strong><div><h3>{title}</h3><p>{text}</p></div></article>)}</div>
       </section>
 
       <section className="delivery-section">
         <div className="section-shell">
-          <div className="section-heading centered-heading"><p className="eyebrow">COMPRA SIMPLE · ACCESO DIGITAL</p><h2>Comprás una vez.<br /><em>Recibís todo en tu correo.</em></h2><p>El proceso es sencillo y podés acceder a las seis guías desde el dispositivo que ya usás todos los días.</p></div>
+          <div className="section-heading centered-heading"><p className="eyebrow">COMPRA SIMPLE · ACCESO DIGITAL</p><h2>Comprás una vez.<br /><em>Recibís los 3 ebooks en tu correo.</em></h2><p>El proceso es sencillo y podés acceder a los materiales desde el dispositivo que ya usás todos los días.</p></div>
           <div className="delivery-flow">
             <article><span><ShieldCheck aria-hidden="true" /></span><small>PASO 1</small><h3>Pagás de forma segura</h3><p>Realizás un único pago protegido a través de Mercado Pago.</p></article>
-            <article><span><Mail aria-hidden="true" /></span><small>PASO 2</small><h3>Te llega todo por correo</h3><p>Recibís el acceso y la información necesaria para abrir las seis guías.</p></article>
+            <article><span><Mail aria-hidden="true" /></span><small>PASO 2</small><h3>Te llega todo por correo</h3><p>Recibís el acceso a CV para resultados reales y a los dos ebooks de regalo.</p></article>
             <article><span><MonitorSmartphone aria-hidden="true" /></span><small>PASO 3</small><h3>Lo ves donde quieras</h3><p>Podés leerlo desde tu celular, tablet, notebook o computadora.</p></article>
           </div>
-          <figure className="delivery-devices"><img src="/acceso-dispositivos-6-ebooks.png" alt="Notebook, tablet y celular mostrando la biblioteca digital con los seis ebooks de Método Entrevista" width="1693" height="929" loading="lazy" decoding="async" /><figcaption><span>ACCESO DIGITAL</span><strong>Las seis guías disponibles en cualquier dispositivo</strong></figcaption></figure>
-        </div>
-      </section>
-
-      <section className="reviews-section">
-        <div className="section-shell">
-          <div className="section-heading centered-heading"><p className="eyebrow">EXPERIENCIAS ILUSTRATIVAS</p><h2>Situaciones reales de búsqueda<br /><em>que el método ayuda a ordenar.</em></h2><p>Ejemplos basados en dificultades y objetivos frecuentes. No representan testimonios verificables de clientes.</p></div>
-          <div className="reviews-carousel-head"></div>
-          <div className="reviews-track" ref={reviewsTrackRef} tabIndex="0" aria-label="Carrusel de casos" aria-live="off" onMouseEnter={() => { reviewsPausedRef.current = true }} onMouseLeave={() => { reviewsPausedRef.current = false }} onFocus={() => { reviewsPausedRef.current = true }} onBlur={() => { reviewsPausedRef.current = false }} onPointerDown={() => { reviewsPausedRef.current = true }} onPointerUp={() => { reviewsPausedRef.current = false }}>
-            {[...exampleReviews, ...exampleReviews].map((review, index) => <article className="review-card" key={`${review.name}-${index}`} data-loop-start={index === exampleReviews.length ? '' : undefined} aria-hidden={index >= exampleReviews.length}>
-              <div className="review-stars" aria-label="Cinco estrellas">★★★★★</div>
-              <blockquote>“{review.message}”</blockquote>
-              <div className="review-person"><span aria-hidden="true">{review.initials}</span><div><strong>{review.name}</strong><small>{review.age} años </small></div></div>
-            </article>)}
-          </div>
+          <div className="cv-device-note"><MonitorSmartphone /><div><span>ACCESO DIGITAL Y DE POR VIDA</span><strong>Leé, aplicá y volvé a consultar los materiales cada vez que quieras adaptar tu CV.</strong></div></div>
         </div>
       </section>
 
       <section className="author-section">
         <div className="section-shell author-strip">
-          <img className="author-avatar" src="/valeria-fursten.png" alt="Valeria Fursten, psicóloga y recruiter" width="1254" height="1254" loading="lazy" decoding="async" />
+          <img className="author-avatar" src="/hernan-berrino.png" alt="Hernán Berrino, creador de Impulso CV" width="942" height="1084" loading="lazy" decoding="async" />
           <div className="author-copy">
-            <p className="eyebrow">CREADO POR UNA PROFESIONAL DE SELECCIÓN</p>
-            <h2>Valeria Fursten</h2>
-            <strong>Psicóloga y recruiter</strong>
-            <p>Reuní herramientas prácticas para ayudarte a presentar mejor tu perfil y ordenar tu búsqueda laboral.</p>
+            <p className="eyebrow">CREADO PARA DARLE SOLUCIÓN A LA FALTA DE ENTREVISTAS.</p>
+            <h2>Hernán Berrino</h2>
+            <strong>Programador y reclutador</strong>
+            <p>Creé una guía práctica con el fin de que puedas facil y rapido, crear incontables CV´s para postular de forma personalizada.</p>
           </div>
         </div>
       </section>
@@ -476,18 +359,18 @@ function App() {
 
       <section className="checkout-section" id="comprar">
         <div className="section-shell checkout-card relative overflow-hidden">
-          <div className="checkout-copy"><p className="eyebrow">OFERTA DE HOY {offerDay}</p><h2>Tu próxima oportunidad puede empezar por <em>cómo te presentás.</em></h2><p>Recibí Método Entrevista y las cinco guías adicionales en una sola compra.</p>
-            <ul><li><Check />6 guías digitales</li><li><Check />Acceso inmediato</li><li><Check />Acceso de por vida</li></ul>
+          <div className="checkout-copy"><p className="eyebrow">OFERTA DE HOY {offerDay}</p><h2>Dejá de enviar el mismo CV.<br /><em>Aprendé a adaptarlo a cada oportunidad.</em></h2><p>Recibí CV para resultados reales más LinkedIn desde cero y Preparación para entrevistas.</p>
+            <ul><li><Check />3 ebooks digitales</li><li><Check />IA gratuita, sin gastos extra</li><li><Check />Acceso inmediato y de por vida</li></ul>
           </div>
-          <div className="checkout-box"><span>OFERTA POR TIEMPO LIMITADO</span><del>$26.990</del><strong>$12.990</strong><small>Pago único · Ahorrás $14.000</small><div className="checkout-bonus">+ 5 EBOOKS GRATIS COMPRANDO AHORA</div><BuyButton inverse onClick={openCheckout}>Comprar ahora con Mercado Pago</BuyButton><p><LockKeyhole size={14} /> Pago protegido por Mercado Pago</p></div>
+          <div className="checkout-box"><span>OFERTA POR TIEMPO LIMITADO</span><del>$29.900</del><strong>$14.900</strong><small>Pago único · Ahorrás $15.000</small><div className="checkout-bonus">+ 2 EBOOKS GRATIS COMPRANDO AHORA</div><BuyButton inverse onClick={openCheckout}>Comprar ahora con Mercado Pago</BuyButton><p><LockKeyhole size={14} /> Pago protegido por Mercado Pago</p></div>
         </div>
       </section>
 
       <footer>
         <div className="section-shell footer-inner">
-          <div className="footer-brand"><strong>MÉTODO ENTREVISTA</strong><p>Herramientas claras para ordenar y mejorar tu búsqueda laboral.</p></div>
-          <div className="footer-contact"><span>CONTACTO Y RECLAMOS</span><a href="mailto:valeriafursten@gmail.com"><Mail aria-hidden="true" />valeriafursten@gmail.com</a><a href="https://instagram.com/psic.valeriafursten" target="_blank" rel="noreferrer"><AtSign aria-hidden="true" />@psic.valeriafursten</a></div>
-          <div className="footer-bottom"><p>© {new Date().getFullYear()} Valeria Fursten</p><small>Método Entrevista brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo. Este sitio utiliza herramientas de Meta para medir visitas, inicios de compra y compras confirmadas.</small></div>
+          <div className="footer-brand"><strong>CV PARA RESULTADOS REALES</strong><p>Herramientas claras para crear, adaptar y mejorar tu currículum.</p></div>
+          <div className="footer-contact"><span>CONTACTO Y RECLAMOS</span><a href="mailto:berrinohernan@gmail.com"><Mail aria-hidden="true" />berrinohernan@gmail.com</a><a href="https://instagram.com/hernan.impulsocv" target="_blank" rel="noreferrer"><AtSign aria-hidden="true" />@hernan.impulsocv</a></div>
+          <div className="footer-bottom"><p>© {new Date().getFullYear()} Hernán Berrino</p><small>CV para resultados reales brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo. Este sitio utiliza herramientas de Meta para medir visitas, inicios de compra y compras confirmadas.</small></div>
         </div>
       </footer>
 
@@ -496,12 +379,12 @@ function App() {
           <button className="modal-close" type="button" aria-label="Cerrar" disabled={checkoutState.status === 'loading'} onClick={() => setCheckoutOpen(false)}><X /></button>
           <span className="modal-kicker">ÚLTIMO PASO ANTES DE PAGAR</span>
           <h2 id="purchase-title">¿A qué correo enviamos tus ebooks?</h2>
-          <p>Escribí un correo al que tengas acceso. Ahí vas a recibir Método Entrevista y las otras cinco guías cuando Mercado Pago confirme la compra.</p>
+          <p>Escribí un correo al que tengas acceso. Ahí vas a recibir CV para resultados reales y los dos ebooks de regalo cuando Mercado Pago confirme la compra.</p>
           <div className="modal-order-summary" aria-label="Resumen de tu compra">
             <strong>Esto es todo lo que te llevás</strong>
-            <div className="modal-summary-row"><span>Método Entrevista</span><span><del>$26.990</del> <b>$12.990</b></span></div>
-            <div className="modal-summary-row"><span>5 ebooks adicionales</span><span><del>$46.000</del> <b>GRATIS</b></span></div>
-            <div className="modal-summary-total"><span>Total a pagar</span><strong>$12.990</strong></div>
+            <div className="modal-summary-row"><span>CV para resultados reales</span><span><del>$29.900</del> <b>$14.900</b></span></div>
+            <div className="modal-summary-row"><span>LinkedIn + Entrevistas</span><span><del>$19.000</del> <b>GRATIS</b></span></div>
+            <div className="modal-summary-total"><span>Total a pagar</span><strong>$14.900</strong></div>
           </div>
           <form onSubmit={startCheckout}>
             <label htmlFor="checkout-email">Tu correo electrónico</label>
@@ -509,8 +392,8 @@ function App() {
             {checkoutState.status === 'error' && <div className="modal-error"><AlertCircle aria-hidden="true" />{checkoutState.message}</div>}
             <button className="modal-pay-button" type="submit" disabled={checkoutState.status === 'loading'}>{checkoutState.status === 'loading' ? <><LoaderCircle className="spin" />Preparando tu compra…</> : <>Continuar a Mercado Pago</>}</button>
           </form>
-          <div className="modal-trust"><span><ShieldCheck />Compra protegida por Mercado Pago</span><span><LockKeyhole />Un solo pago de $12.990</span></div>
-          <p className="purchase-help">¿Problemas con la compra? <a href="mailto:valeriafursten@gmail.com">Escribime a valeriafursten@gmail.com</a></p>
+          <div className="modal-trust"><span><ShieldCheck />Compra protegida por Mercado Pago</span><span><LockKeyhole />Un solo pago de $14.900</span></div>
+          <p className="purchase-help">¿Problemas con la compra? <a href="mailto:berrinohernan@gmail.com">Escribime a berrinohernan@gmail.com</a></p>
           <small>Usaremos este correo únicamente para gestionar tu compra y enviarte los materiales.</small>
         </section>
       </div>}
@@ -520,12 +403,12 @@ function App() {
           <button className="modal-close" type="button" aria-label="Cerrar" onClick={closePaymentNotice}><X /></button>
           {paymentNotice.status === 'approved' ? <CheckCircle2 className="status-icon status-success" /> : paymentNotice.status === 'failure' ? <AlertCircle className="status-icon status-error" /> : <LoaderCircle className="status-icon status-pending spin" />}
           <h2 id="payment-status-title">{paymentNotice.status === 'approved' ? '¡Pago confirmado!' : paymentNotice.status === 'failure' ? 'El pago no se completó' : paymentNotice.status === 'checking' ? 'Estamos confirmando tu pago' : 'Tu pago está pendiente'}</h2>
-          <p>{paymentNotice.status === 'approved' ? paymentNotice.delivered ? 'Tus seis ebooks ya fueron enviados al correo que ingresaste. Revisá también la carpeta de spam o promociones.' : 'Tus ebooks están en proceso de envío. En unos momentos los vas a recibir en el correo que ingresaste.' : paymentNotice.status === 'failure' ? 'No se realizó ningún envío. Podés volver a intentarlo cuando quieras.' : 'Mercado Pago todavía está procesando la operación. Cuando quede aprobada, enviaremos automáticamente los seis ebooks a tu correo.'}</p>
+          <p>{paymentNotice.status === 'approved' ? paymentNotice.delivered ? 'Tus tres ebooks ya fueron enviados al correo que ingresaste. Revisá también la carpeta de spam o promociones.' : 'Tus ebooks están en proceso de envío. En unos momentos los vas a recibir en el correo que ingresaste.' : paymentNotice.status === 'failure' ? 'No se realizó ningún envío. Podés volver a intentarlo cuando quieras.' : 'Mercado Pago todavía está procesando la operación. Cuando quede aprobada, enviaremos automáticamente los tres ebooks a tu correo.'}</p>
           <button className="modal-secondary-button" type="button" onClick={closePaymentNotice}>{paymentNotice.status === 'failure' ? 'Volver a la página' : 'Entendido'}</button>
         </section>
       </div>}
 
-      {showMobileBuy && <div className="mobile-buy"><button type="button" onClick={openCheckout}>Comprar por $12.990</button></div>}
+      {showMobileBuy && <div className="mobile-buy"><button type="button" onClick={openCheckout}>Comprar por $14.900</button></div>}
     </main>
   )
 }

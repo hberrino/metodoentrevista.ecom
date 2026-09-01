@@ -1,6 +1,6 @@
-# Método Entrevista
+# CV para resultados reales
 
-Método Entrevista es un e-commerce de productos digitales orientado a la búsqueda laboral. La plataforma comercializa un paquete compuesto por una guía principal y cinco ebooks complementarios, mediante una landing page diseñada para presentar el contenido y completar la compra en un único recorrido.
+CV para resultados reales es un e-commerce de productos digitales orientado a la búsqueda laboral. La propuesta incluye el ebook principal para crear y adaptar un CV, más dos ebooks de regalo: LinkedIn desde cero y Preparación para entrevistas.
 
 ## Arquitectura
 
@@ -13,7 +13,7 @@ La aplicación se ejecuta como un único servicio y está compuesta por:
 - Mercado Pago Checkout Pro para procesar los pagos.
 - Webhooks firmados para confirmar las operaciones directamente con Mercado Pago.
 - Nodemailer y Gmail SMTP para el envío automático de los accesos.
-- Google Drive como biblioteca de entrega de los seis ebooks.
+- Google Drive como biblioteca de entrega de los tres ebooks.
 - Persistencia local de órdenes para registrar el estado del pago y evitar entregas duplicadas.
 - Helmet, validación de datos y límites de solicitudes para reforzar la seguridad de la API.
 

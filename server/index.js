@@ -22,17 +22,14 @@ const dataDirectory = path.join(projectRoot, 'data')
 const ordersPath = path.join(dataDirectory, 'orders.json')
 const port = Number(process.env.PORT || 3001)
 const host = process.env.HOST || '127.0.0.1'
-const productPrice = 12990
+const productPrice = 14900
 const productCurrency = 'ARS'
-const productId = 'metodo-entrevista-pack'
-const contactEmail = 'valeriafursten@gmail.com'
+const productId = 'cv-resultados-reales'
+const contactEmail = 'berrinohernan@gmail.com'
 
 const ebookLinks = [
-  ['Método Entrevista', process.env.EBOOK_METODO_URL],
-  ['CV listo para postularte', process.env.EBOOK_CV_URL],
-  ['IA aplicada a conseguir empleo', process.env.EBOOK_IA_URL],
+  ['CV para resultados reales', process.env.EBOOK_CV_URL],
   ['LinkedIn desde cero', process.env.EBOOK_LINKEDIN_URL],
-  ['Guía de empleos', process.env.EBOOK_EMPLEOS_URL],
   ['Preparación para entrevistas', process.env.EBOOK_ENTREVISTAS_URL],
 ]
 
@@ -183,15 +180,15 @@ async function sendEbooks(order) {
     ? `Abrí tu biblioteca completa: ${delivery.folderUrl}`
     : delivery.links.map(([name, url]) => `${name}: ${url}`).join('\n')
   const accessButton = delivery.folderUrl
-    ? `<p style="margin:28px 0"><a href="${delivery.folderUrl}" style="display:inline-block;padding:15px 22px;border-radius:9px;background:#e85d43;color:#fff;font-weight:800;text-decoration:none">Abrir mis 6 ebooks</a></p>`
+    ? `<p style="margin:28px 0"><a href="${delivery.folderUrl}" style="display:inline-block;padding:15px 22px;border-radius:9px;background:#e85d43;color:#fff;font-weight:800;text-decoration:none">Abrir mis 3 ebooks</a></p>`
     : ''
   await mailTransport().sendMail({
-    from: process.env.SMTP_FROM || `Método Entrevista <${process.env.SMTP_USER}>`,
+    from: process.env.SMTP_FROM || `CV para resultados reales <${process.env.SMTP_USER}>`,
     replyTo: contactEmail,
     to: order.email,
-    subject: 'Tus 6 ebooks de Método Entrevista',
+    subject: 'Tus ebooks de CV para resultados reales',
     text: `¡Gracias por tu compra! Tus ebooks están listos:\n\n${accessText}\n\nIncluye:\n${delivery.links.map((item) => `- ${Array.isArray(item) ? item[0] : item}`).join('\n')}\n\nConsultas: ${contactEmail}`,
-    html: `<div style="max-width:620px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#13223a"><h1 style="font-family:Georgia,serif">Tu compra fue confirmada</h1><p>Ya podés acceder a Método Entrevista y los cinco ebooks incluidos:</p>${accessButton}<ul style="padding-left:20px">${list}</ul><p style="margin-top:28px;color:#5f6b7d">Guardá este correo. Si necesitás ayuda, escribinos a <a href="mailto:${contactEmail}">${contactEmail}</a>.</p></div>`,
+    html: `<div style="max-width:620px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#13223a"><h1 style="font-family:Georgia,serif">Tu compra fue confirmada</h1><p>Ya podés acceder a CV para resultados reales y a los dos ebooks de regalo:</p>${accessButton}<ul style="padding-left:20px">${list}</ul><p style="margin-top:28px;color:#5f6b7d">Guardá este correo. Si necesitás ayuda, escribinos a <a href="mailto:${contactEmail}">${contactEmail}</a>.</p></div>`,
   })
 }
 
@@ -272,7 +269,7 @@ app.post('/api/checkout', checkoutRateLimit, async (req, res) => {
     const { preference } = mercadoPagoClients()
     const result = await preference.create({
       body: {
-        items: [{ id: productId, title: 'Método Entrevista + 5 ebooks', quantity: 1, currency_id: productCurrency, unit_price: productPrice }],
+        items: [{ id: productId, title: 'CV para resultados reales + 2 ebooks', quantity: 1, currency_id: productCurrency, unit_price: productPrice }],
         payer: { email },
         external_reference: orderId,
         metadata: { order_id: orderId },
@@ -283,7 +280,7 @@ app.post('/api/checkout', checkoutRateLimit, async (req, res) => {
         },
         auto_return: 'approved',
         notification_url: `${baseUrl}/api/mercadopago/webhook`,
-        statement_descriptor: 'METODO ENTREVISTA',
+        statement_descriptor: 'CV RESULTADOS',
       },
       requestOptions: { idempotencyKey: orderId },
     })
@@ -363,4 +360,4 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: 'Ocurrió un error inesperado.' })
 })
 
-app.listen(port, host, () => console.log(`Método Entrevista disponible en http://${host}:${port}`))
+app.listen(port, host, () => console.log(`CV para resultados reales disponible en http://${host}:${port}`))

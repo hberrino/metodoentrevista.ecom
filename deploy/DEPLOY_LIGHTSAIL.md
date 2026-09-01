@@ -1,4 +1,4 @@
-# Publicar Método Entrevista en Lightsail
+# Publicar CV para resultados reales en Lightsail
 
 Esta configuración ejecuta Node solamente en `127.0.0.1:3002`. Nginx recibe las visitas públicas y las deriva al proceso, incluyendo `/api/checkout` y `/api/mercadopago/webhook`. Es independiente de los otros sitios alojados en la misma instancia.
 
@@ -40,6 +40,7 @@ META_CONVERSIONS_API_TOKEN=
 META_GRAPH_API_VERSION=v23.0
 META_TEST_EVENT_CODE=
 SMTP_PASS=
+EBOOK_FOLDER_URL=https://drive.google.com/drive/folders/1iEi-eEwWg4M6z1hOfwKu4Js0krM3tEVk?usp=sharing
 ```
 
 ## 3. Mantener Node activo con systemd
@@ -98,7 +99,7 @@ En la aplicación de Mercado Pago:
 5. Colocar el Access Token de producción en `MERCADOPAGO_ACCESS_TOKEN`.
 6. Reiniciar el proceso con `sudo systemctl restart metodoentrevista.service`.
 
-Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únicamente después de que el webhook esté firmado y la API confirme pago aprobado, importe de `$12.990` y moneda `ARS`.
+Probar primero con credenciales y cuentas de prueba. La entrega se ejecuta únicamente después de que el webhook esté firmado y la API confirme pago aprobado, importe de `$14.900` y moneda `ARS`.
 
 ## Meta Pixel y Conversions API
 
@@ -114,7 +115,7 @@ El navegador carga el Pixel al ingresar. La compra se envía también desde el s
 
 ## 7. Activar el envío desde Gmail
 
-1. Activar verificación en dos pasos en `valeriafursten@gmail.com`.
+1. Activar verificación en dos pasos en `berrinohernan@gmail.com`.
 2. Crear una contraseña de aplicación para correo.
 3. Guardarla en `SMTP_PASS` dentro de `.env`.
 4. Reiniciar con `sudo systemctl restart metodoentrevista.service`.
