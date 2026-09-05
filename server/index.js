@@ -25,7 +25,7 @@ const host = process.env.HOST || '127.0.0.1'
 const productPrice = 14900
 const productCurrency = 'ARS'
 const productId = 'cv-resultados-reales'
-const contactEmail = 'berrinohernan@gmail.com'
+const contactEmail = 'valeriafursten@gmail.com'
 
 const ebookLinks = [
   ['CV para resultados reales', process.env.EBOOK_CV_URL],

@@ -115,7 +115,7 @@ El navegador carga el Pixel al ingresar. La compra se envía también desde el s
 
 ## 7. Activar el envío desde Gmail
 
-1. Activar verificación en dos pasos en `berrinohernan@gmail.com`.
+1. Activar verificación en dos pasos en `valeriafursten@gmail.com`.
 2. Crear una contraseña de aplicación para correo.
 3. Guardarla en `SMTP_PASS` dentro de `.env`.
 4. Reiniciar con `sudo systemctl restart metodoentrevista.service`.

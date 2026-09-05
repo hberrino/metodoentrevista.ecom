@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  AlertCircle, AtSign, Check, CheckCircle2, ChevronDown, LoaderCircle,
+  AlertCircle, Check, CheckCircle2, ChevronDown, LoaderCircle,
   LockKeyhole, Mail, MonitorSmartphone, ShieldCheck, X,
 } from 'lucide-react'
 import './App.css'
@@ -340,18 +340,6 @@ function App() {
         </div>
       </section>
 
-      <section className="author-section">
-        <div className="section-shell author-strip">
-          <img className="author-avatar" src="/hernan-berrino.png" alt="Hernán Berrino, creador de Impulso CV" width="942" height="1084" loading="lazy" decoding="async" />
-          <div className="author-copy">
-            <p className="eyebrow">CREADO PARA DARLE SOLUCIÓN A LA FALTA DE ENTREVISTAS.</p>
-            <h2>Hernán Berrino</h2>
-            <strong>Programador y reclutador</strong>
-            <p>Creé una guía práctica con el fin de que puedas facil y rapido, crear incontables CV´s para postular de forma personalizada.</p>
-          </div>
-        </div>
-      </section>
-
       <section className="faq-section section-shell">
         <div className="section-heading centered-heading"><p className="eyebrow">PREGUNTAS FRECUENTES</p><h2>Todo lo que necesitás saber<br /><em>antes de empezar.</em></h2></div>
         <div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<ChevronDown aria-hidden="true" /></summary><p>{answer}</p></details>)}</div>
@@ -369,8 +357,8 @@ function App() {
       <footer>
         <div className="section-shell footer-inner">
           <div className="footer-brand"><strong>CV PARA RESULTADOS REALES</strong><p>Herramientas claras para crear, adaptar y mejorar tu currículum.</p></div>
-          <div className="footer-contact"><span>CONTACTO Y RECLAMOS</span><a href="mailto:berrinohernan@gmail.com"><Mail aria-hidden="true" />berrinohernan@gmail.com</a><a href="https://instagram.com/hernan.impulsocv" target="_blank" rel="noreferrer"><AtSign aria-hidden="true" />@hernan.impulsocv</a></div>
-          <div className="footer-bottom"><p>© {new Date().getFullYear()} Hernán Berrino</p><small>CV para resultados reales brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo. Este sitio utiliza herramientas de Meta para medir visitas, inicios de compra y compras confirmadas.</small></div>
+          <div className="footer-contact"><span>CONTACTO Y RECLAMOS</span><a href="mailto:valeriafursten@gmail.com"><Mail aria-hidden="true" />valeriafursten@gmail.com</a></div>
+          <div className="footer-bottom"><p>© {new Date().getFullYear()} Valeria Fursten</p><small>CV para resultados reales brinda herramientas de orientación y preparación profesional. Los resultados pueden variar según la experiencia, el mercado laboral y la implementación de cada persona. No se garantiza la obtención de entrevistas ni de empleo. Este sitio utiliza herramientas de Meta para medir visitas, inicios de compra y compras confirmadas.</small></div>
         </div>
       </footer>
 
@@ -393,7 +381,7 @@ function App() {
             <button className="modal-pay-button" type="submit" disabled={checkoutState.status === 'loading'}>{checkoutState.status === 'loading' ? <><LoaderCircle className="spin" />Preparando tu compra…</> : <>Continuar a Mercado Pago</>}</button>
           </form>
           <div className="modal-trust"><span><ShieldCheck />Compra protegida por Mercado Pago</span><span><LockKeyhole />Un solo pago de $14.900</span></div>
-          <p className="purchase-help">¿Problemas con la compra? <a href="mailto:berrinohernan@gmail.com">Escribime a berrinohernan@gmail.com</a></p>
+          <p className="purchase-help">¿Problemas con la compra? <a href="mailto:valeriafursten@gmail.com">Escribime a valeriafursten@gmail.com</a></p>
           <small>Usaremos este correo únicamente para gestionar tu compra y enviarte los materiales.</small>
         </section>
       </div>}
